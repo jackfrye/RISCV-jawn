@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+#include "Registers.h"
+
 using namespace std;
 
 Registers::Registers()
