@@ -39,6 +39,8 @@ bool Core::tick()
 		read_data1 = registers->read_reg((int)read_register1);
 		read_data2 = registers->read_reg((int)read_register2);
 
+        uint64_t imm_gen_extended = (uint64_t) instruction.instruction;
+
 		/*
 			Step Three: Simulator related
 		*/
