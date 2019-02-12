@@ -8,6 +8,7 @@
 
 #include "Instruction_Memory.h"
 #include "Instruction.h"
+#include "Registers.h"
 
 using namespace std;
 
@@ -19,6 +20,14 @@ public:
 	bool tick(); // FALSE means all the instructions are exhausted
 
 	int id; // Each core has its own ID
+
+	/* Registers signals */
+	uint8_t read_register1;
+	uint8_t read_register2;
+	uint8_t write_register;
+	uint8_t write_data;
+	uint32_t read_data1;
+	uint32_t read_data2;
 
 	void printInstrs()
 	{
@@ -40,6 +49,7 @@ private:
 	long PC;
 
 	Instruction_Memory *instr_mem;
+	Registers *registers;
 
 	/*
 		Group Two: Simulator Related

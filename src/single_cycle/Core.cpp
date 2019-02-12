@@ -5,7 +5,7 @@ Core::Core(const string &fname, ofstream *out) : out(out),
 						PC(0),
 						instr_mem(new Instruction_Memory(fname))
 {
-
+	registers = new Registers();
 }
 
 /*
@@ -32,6 +32,12 @@ bool Core::tick()
 		// Increment PC
 		// TODO, PC should be incremented or decremented based on instruction
 		PC += 4;
+		
+		read_register1 = (instruction.instruction >> 15) & 0x1F;
+		read_register2; = (instruction.instruction >> 20) & 0x1F;
+		write_register = (instruction.instruction >> 7) & 0x1F;
+		read_data1 = registers.read_reg((int)read_register1);
+		read_data2 = registers.read_reg((int)read_reigster2);
 
 		/*
 			Step Three: Simulator related
