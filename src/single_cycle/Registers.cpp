@@ -1,12 +1,4 @@
-#ifndef __REGISTER_H__
-#define __REGISTER_H__
-
-#include <vector>
-#include <string>
-
 #include "Registers.h"
-
-using namespace std;
 
 Registers::Registers()
 {
@@ -21,5 +13,3 @@ void Registers::assign_reg(int index, uint64_t value)
 {
 	registers[index] = value;
 }
-
-#endif
