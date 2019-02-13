@@ -66,6 +66,8 @@ private:
 	Control *control;
 	Algo_Logic_Unit *alu;
 
+	uint8_t alu_in;
+
 
 	/*
 		Group Two: Simulator Related

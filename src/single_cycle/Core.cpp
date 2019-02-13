@@ -7,6 +7,7 @@ Core::Core(const string &fname, ofstream *out) : out(out),
 {
 	registers = new Registers();
 	control = new Control();
+	alu = new Algo_Logic_Unit();
 }
 
 /*
@@ -49,6 +50,10 @@ bool Core::tick()
 		mem_write = control->get_mem_write();
 		alu_src = control->get_alu_src();
 		reg_write = control->get_reg_write();
+
+		alu_in = ((instruction.instruction >> 27) & 0x8) | ( (instruction.instruction >> 12) & 0x7 );
+
+		alu->set_alu_ops( read_data1, read_data2, alu_in, alu_op);
 
 
 		PC += 4;
