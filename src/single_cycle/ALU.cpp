@@ -1,9 +1,9 @@
 #include "ALU.h"
 
-#define AND       0
-#define OR        1
-#define ADD       2
-#define SUBTRACT  3
+#define AND       0x0
+#define OR        0x1
+#define ADD       0x2
+#define SUBTRACT  0x6
 
 Algo_Logic_Unit::Algo_Logic_Unit()
 {
