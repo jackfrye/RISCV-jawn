@@ -38,6 +38,7 @@ bool Core::tick()
 		read_data1 = registers->read_reg((int)read_register1);
 		read_data2 = registers->read_reg((int)read_register2);
 
+
 		op_code = instruction.instruction & 0x00FF;
 		control->set_op_code(op_code);
 		
@@ -51,6 +52,9 @@ bool Core::tick()
 
 
 		PC += 4;
+
+
+
 		/*
 			Step Three: Simulator related
 		*/

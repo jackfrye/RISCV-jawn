@@ -10,6 +10,7 @@
 #include "Instruction.h"
 #include "Registers.h"
 #include "Control.h"
+#include "ALU.h"
 
 using namespace std;
 
@@ -63,6 +64,8 @@ private:
 	uint8_t op_code;
 
 	Control *control;
+	Algo_Logic_Unit *alu;
+
 
 	/*
 		Group Two: Simulator Related
