@@ -64,11 +64,11 @@ private:
 	bool reg_write;
 	uint8_t op_code;
 
+    uint8_t funct7;
+    uint8_t funct3;
+
 	Control *control;
 	Algo_Logic_Unit *alu;
-
-	uint8_t alu_in;
-
 
 	/*
 		Group Two: Simulator Related

@@ -52,14 +52,12 @@ bool Core::tick()
 		alu_src = control->get_alu_src();
 		reg_write = control->get_reg_write();
 
-		alu_in = ((instruction.instruction >> 27) & 0x8) | ( (instruction.instruction >> 12) & 0x7 );
+        funct7 = (instruction.instruction >> 25) & 0x7F;
+        funct3 = (instruction.instruction >> 12) & 0x7;
 
-		alu->set_alu_ops( read_data1, read_data2, alu_in, alu_op_0, alu_op_1);
-
+		alu->set_alu_ops( read_data1, read_data2, alu_op_0, alu_op_1, funct7, funct3);
 
 		PC += 4;
-
-
 
 		/*
 			Step Three: Simulator related

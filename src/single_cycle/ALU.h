@@ -8,14 +8,23 @@ using namespace std;
 class Algo_Logic_Unit
 {
 private:
-    uint32_t alu_result;
+    uint64_t op_1;
+    uint64_t op_2;
+
+    bool alu_op_0;
+    bool alu_op_1;
+
+    uint8_t funct7; 
+    uint8_t funct3;
+
+    uint64_t alu_result;
 
 public:
     Algo_Logic_Unit();
 
-    void set_alu_ops(uint32_t op_1, uint32_t op_2, uint8_t alu_control, bool alu_op_0, bool alu_op_1);
+    void set_alu_ops(uint64_t op_1, uint64_t op_2, bool alu_op_0, bool alu_op_1, uint8_t funct7, uint8_t funct3);
     
-    uint32_t get_alu_result() { return alu_result; }
+    uint64_t get_alu_result() { return alu_result; }
 };
 
 #endif

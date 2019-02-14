@@ -55,6 +55,17 @@ Control::Control(uint8_t _op_code)
 		alu_op_1 = 0;
 		alu_op_0 = 1;
 	}
+    else if(op_code == 0x13) // I-Format
+    {
+		alu_src = 0;
+		mem_to_reg = 0;
+		reg_write = 1;
+		mem_read = 1;
+		mem_write = 0;
+		branch = 0;
+		alu_op_1 = 1;
+		alu_op_0 = 0;
+    }
 	else
 	{
 		alu_src = 0;
@@ -115,6 +126,17 @@ void Control::set_op_code(uint8_t _op_code)
 		alu_op_1 = 0;
 		alu_op_0 = 1;
 	}
+    else if(op_code == 0x13) // I-Format
+    {
+		alu_src = 0;
+		mem_to_reg = 0;
+		reg_write = 1;
+		mem_read = 1;
+		mem_write = 0;
+		branch = 0;
+		alu_op_1 = 1;
+		alu_op_0 = 0;
+    }
 	else
 	{
 		alu_src = 0;
