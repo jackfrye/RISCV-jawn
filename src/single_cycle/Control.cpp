@@ -1,4 +1,3 @@
-
 #include "Control.h"
 
 using namespace std;
@@ -11,7 +10,7 @@ Control::Control()
 Control::Control(uint8_t _op_code)
 {
 	op_code = _op_code;
-	if(op_code == 0x33) // R-Format
+	if(op_code == R_FORMAT) // R-Format
 	{
 		alu_src = 0;
 		mem_to_reg = 0;
@@ -22,7 +21,7 @@ Control::Control(uint8_t _op_code)
 		alu_op_1 = 1;
 		alu_op_0 = 0;
 	}
-	else if(op_code == 0x03) // load double word
+	else if(op_code == LOAD) // load double word
 	{
 		alu_src = 1;
 		mem_to_reg = 1;
@@ -33,7 +32,7 @@ Control::Control(uint8_t _op_code)
 		alu_op_1 = 0;
 		alu_op_0 = 0;
 	}
-	else if(op_code == 0x23) // store double word
+	else if(op_code == STORE) // store double word
 	{
 		alu_src = 1;
 		mem_to_reg = -1;
@@ -44,7 +43,7 @@ Control::Control(uint8_t _op_code)
 		alu_op_1 = 0;
 		alu_op_0 = 0;
 	}
-	else if(op_code == 0x36) // branch if equal
+	else if(op_code == BRANCH) // branch if equal
 	{
 		alu_src = 0;
 		mem_to_reg = -1;
@@ -55,7 +54,7 @@ Control::Control(uint8_t _op_code)
 		alu_op_1 = 0;
 		alu_op_0 = 1;
 	}
-    else if(op_code == 0x13) // I-Format
+    else if(op_code == I_FORMAT) // I-Format
     {
 		alu_src = 0;
 		mem_to_reg = 0;
@@ -82,7 +81,7 @@ Control::Control(uint8_t _op_code)
 void Control::set_op_code(uint8_t _op_code)
 {
 	op_code = _op_code;
-	if(op_code == 0x33) // R-Format
+	if(op_code == R_FORMAT) // R-Format
 	{
 		alu_src = 0;
 		mem_to_reg = 0;
@@ -93,7 +92,7 @@ void Control::set_op_code(uint8_t _op_code)
 		alu_op_1 = 1;
 		alu_op_0 = 0;
 	}
-	else if(op_code == 0x03) // load double word
+	else if(op_code == LOAD) // load double word
 	{
 		alu_src = 1;
 		mem_to_reg = 1;
@@ -104,7 +103,7 @@ void Control::set_op_code(uint8_t _op_code)
 		alu_op_1 = 0;
 		alu_op_0 = 0;
 	}
-	else if(op_code == 0x23) // store double word
+	else if(op_code == STORE) // store double word
 	{
 		alu_src = 1;
 		mem_to_reg = -1;
@@ -115,7 +114,7 @@ void Control::set_op_code(uint8_t _op_code)
 		alu_op_1 = 0;
 		alu_op_0 = 0;
 	}
-	else if(op_code == 0x36) // branch if equal
+	else if(op_code == BRANCH) // branch if equal
 	{
 		alu_src = 0;
 		mem_to_reg = -1;
@@ -126,7 +125,7 @@ void Control::set_op_code(uint8_t _op_code)
 		alu_op_1 = 0;
 		alu_op_0 = 1;
 	}
-    else if(op_code == 0x13) // I-Format
+    else if(op_code == I_FORMAT) // I-Format
     {
 		alu_src = 0;
 		mem_to_reg = 0;
