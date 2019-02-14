@@ -46,14 +46,15 @@ bool Core::tick()
 		branch = control->get_branch();
 		mem_read = control->get_mem_read();
 		mem_to_reg = control->get_mem_to_reg();
-		alu_op = control->get_alu_op();
+		alu_op_0 = control->get_alu_op_0();
+		alu_op_1 = control->get_alu_op_1();
 		mem_write = control->get_mem_write();
 		alu_src = control->get_alu_src();
 		reg_write = control->get_reg_write();
 
 		alu_in = ((instruction.instruction >> 27) & 0x8) | ( (instruction.instruction >> 12) & 0x7 );
 
-		alu->set_alu_ops( read_data1, read_data2, alu_in, alu_op);
+		alu->set_alu_ops( read_data1, read_data2, alu_in, alu_op_0, alu_op_1);
 
 
 		PC += 4;

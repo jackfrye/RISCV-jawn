@@ -9,7 +9,7 @@ Algo_Logic_Unit::Algo_Logic_Unit()
 {
 }
 
-void Algo_Logic_Unit::set_alu_ops(uint32_t op_1, uint32_t op_2, uint8_t alu_control, bool alu_op)
+void Algo_Logic_Unit::set_alu_ops(uint32_t op_1, uint32_t op_2, uint8_t alu_control, bool alu_op_0, bool alu_op_1)
 {
     uint32_t tmp_result;
 
@@ -30,6 +30,6 @@ void Algo_Logic_Unit::set_alu_ops(uint32_t op_1, uint32_t op_2, uint8_t alu_cont
             break;
     }
 
-    this->alu_result = (alu_op) ? tmp_result : 0;
+    this->alu_result = (alu_op_0) ? tmp_result : 0;
 }
 

@@ -57,7 +57,8 @@ private:
 	bool branch;
 	bool mem_read;
 	bool mem_to_reg;
-	bool alu_op;
+	bool alu_op_0;
+	bool alu_op_1;
 	bool mem_write;
 	bool alu_src;
 	bool reg_write;
