@@ -1,4 +1,3 @@
-
 #include "Control.h"
 
 using namespace std;
