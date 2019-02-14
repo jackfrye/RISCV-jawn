@@ -5,6 +5,8 @@
 #include <map>
 #include <bitset>
 
+using namespace std;
+
 class Data_Memory
 {
 public:
@@ -13,6 +15,6 @@ public:
 	unsigned int read_data(long address);
 private:
 	map<long, unsigned int> data;
-}
+};
 
 #endif
