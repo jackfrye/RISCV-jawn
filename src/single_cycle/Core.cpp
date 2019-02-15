@@ -1,4 +1,5 @@
 #include "Core.h"
+#include <bitset>
 
 Core::Core(const string &fname, ofstream *out) : out(out), 
 						clk(0), 
@@ -9,6 +10,7 @@ Core::Core(const string &fname, ofstream *out) : out(out),
 	control = new Control();
 	alu = new Algo_Logic_Unit();
     imm_gen = new Imm_gen();
+    data_memory = new Data_Memory();
 }
 
 /*
@@ -32,6 +34,9 @@ bool Core::tick()
 		// Get Instruction
 		Instruction &instruction = instr_mem->get_instruction(PC);
 
+        bitset<32> x(instruction.instruction);
+        cout << "Instruction: " << x << "\n";
+
 		// Increment PC
 		// TODO, PC should be incremented or decremented based on instruction
 		read_register1 = (instruction.instruction >> 15) & 0x1F;
@@ -40,6 +45,20 @@ bool Core::tick()
 		read_data1 = registers->read_reg((int)read_register1);
 		read_data2 = registers->read_reg((int)read_register2);
 
+#if 0
+        bitset<8> x1(read_register1);
+        cout << "Read reg " << x1 << "\n";
+        bitset<8> x2(read_register2);
+        cout << "Read reg " << x2 << "\n";
+        bitset<8> x3(write_register);
+        cout << "Write reg " << x3 << "\n";
+        bitset<8> x4(write_data);
+        cout << "Write data " << x4 << "\n";
+        bitset<64> x5(read_data1);
+        cout << "Read data1 " << x5 << "\n";
+        bitset<64> x6(read_data2);
+        cout << "Read data2 " << x6 << "\n";
+#endif
 
 		op_code = instruction.instruction & 0x00FF;
 		control->set_op_code(op_code);
@@ -64,8 +83,30 @@ bool Core::tick()
         }
 
 		alu->set_alu_ops( read_data1, read_data2, alu_op_0, alu_op_1, funct7, funct3);
+        alu_out = alu->get_alu_result();
+        alu_zero = alu->get_alu_is_zero();
 
-		PC += 4;
+        if (mem_write) {
+            data_memory->write_data(alu_out, read_data2);
+        }
+
+        if (mem_read) {
+            data_mem_read = data_memory->read_data(alu_out);
+        }
+        
+        uint64_t tmp;
+        tmp = (mem_to_reg) ? data_mem_read : alu_out;
+        
+        if (reg_write) {
+            registers->assign_reg(write_register, tmp);
+        }
+
+        if (branch && alu_zero) {
+            PC = PC + imm_gen_result << 1;
+        }
+        else {
+            PC += 4;
+        }
 
 		/*
 			Step Three: Simulator related

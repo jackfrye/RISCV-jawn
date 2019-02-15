@@ -12,6 +12,7 @@
 #include "Control.h"
 #include "ALU.h"
 #include "Imm_gen.h"
+#include "Data_Memory.h"
 
 using namespace std;
 
@@ -51,8 +52,8 @@ private:
 	uint8_t read_register2;
 	uint8_t write_register;
 	uint8_t write_data;
-	uint32_t read_data1;
-	uint32_t read_data2;
+	uint64_t read_data1;
+	uint64_t read_data2;
 
 	/* Control signals */
 	bool branch;
@@ -74,6 +75,11 @@ private:
     uint64_t imm_gen_result;
 
 	Algo_Logic_Unit *alu;
+    bool alu_zero;
+    uint64_t alu_out;
+
+    Data_Memory *data_memory;
+    unsigned int data_mem_read;
 
 	/*
 		Group Two: Simulator Related

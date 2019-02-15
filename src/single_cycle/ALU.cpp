@@ -13,7 +13,7 @@ void Algo_Logic_Unit::set_alu_ops(uint64_t op_1, uint64_t op_2, bool alu_op_0, b
     }
     else if (!alu_op_1 && alu_op_0) { // ALUop 01 (BEQ)
         tmp_result = op_1 - op_2;
-        tmp_result = (tmp_result == 0) ? 1 : 0;
+        is_zero = (tmp_result == 0) ? 1 : 0;
     }
     else if (alu_op_1 && !alu_op_0) { // ALUop 10 (R-type)
         if (funct7 == 0x20) {
