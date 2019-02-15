@@ -1,10 +1,10 @@
 #include "Imm_gen.h"
 
-Imm_gen::Imm_gen()
+Imm_gen::Imm_gen() 
 {
 }
 
-void Imm_gen::Imm_gen(uint8_t op_code, uint32_t instruction)
+void Imm_gen::set_imm_gen(uint8_t op_code, uint32_t instruction)
 {
     uint64_t tmp;
 
