@@ -11,6 +11,7 @@
 #include "Registers.h"
 #include "Control.h"
 #include "ALU.h"
+#include "Imm_gen.h"
 
 using namespace std;
 
@@ -68,6 +69,10 @@ private:
     uint8_t funct3;
 
 	Control *control;
+
+    Imm_gen *imm_gen;
+    uint64_t imm_gen_result;
+
 	Algo_Logic_Unit *alu;
 
 	/*

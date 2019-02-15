@@ -8,6 +8,7 @@ Core::Core(const string &fname, ofstream *out) : out(out),
 	registers = new Registers();
 	control = new Control();
 	alu = new Algo_Logic_Unit();
+    imm_gen = new Imm_gen();
 }
 
 /*
@@ -54,6 +55,13 @@ bool Core::tick()
 
         funct7 = (instruction.instruction >> 25) & 0x7F;
         funct3 = (instruction.instruction >> 12) & 0x7;
+
+        imm_gen->set_imm_gen(op_code, instruction.instruction);
+        imm_gen_result = imm_gen->get_imm_gen_result();
+
+        if (alu_src) {
+            read_data2 = imm_gen_result;
+        }
 
 		alu->set_alu_ops( read_data1, read_data2, alu_op_0, alu_op_1, funct7, funct3);
 
