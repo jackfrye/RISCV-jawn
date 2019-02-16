@@ -42,23 +42,8 @@ bool Core::tick()
 		read_register1 = (instruction.instruction >> 15) & 0x1F;
 		read_register2 = (instruction.instruction >> 20) & 0x1F;
 		write_register = (instruction.instruction >> 7) & 0x1F;
-		read_data1 = registers->read_reg((int)read_register1);
+	    read_data1 = registers->read_reg((int)read_register1);
 		read_data2 = registers->read_reg((int)read_register2);
-
-#if 0
-        bitset<8> x1(read_register1);
-        cout << "Read reg " << x1 << "\n";
-        bitset<8> x2(read_register2);
-        cout << "Read reg " << x2 << "\n";
-        bitset<8> x3(write_register);
-        cout << "Write reg " << x3 << "\n";
-        bitset<8> x4(write_data);
-        cout << "Write data " << x4 << "\n";
-        bitset<64> x5(read_data1);
-        cout << "Read data1 " << x5 << "\n";
-        bitset<64> x6(read_data2);
-        cout << "Read data2 " << x6 << "\n";
-#endif
 
 		op_code = instruction.instruction & 0x00FF;
 		control->set_op_code(op_code);
