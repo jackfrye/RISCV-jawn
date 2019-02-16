@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -15,6 +16,7 @@ public:
 	Registers();
 	uint64_t read_reg(int);
 	void assign_reg(int, uint64_t);
+	void printRegs(ofstream *out);
 };
 
 #endif

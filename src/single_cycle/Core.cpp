@@ -11,6 +11,7 @@ Core::Core(const string &fname, ofstream *out) : out(out),
 	alu = new Algo_Logic_Unit();
     imm_gen = new Imm_gen();
     data_memory = new Data_Memory();
+	registers->assign_reg(0,0);
 }
 
 /*
@@ -137,5 +138,9 @@ void Core::printStats(list<Instruction>::iterator &ite)
 	*out << "Core ID: " << id << "; ";
 	*out << "Begin Exe: " << ite->begin_exe << "; ";
 	*out << "End Exe: " << ite->end_exe << endl;
+	printMem();	
+	printRegs();
+	
+
 }
 
