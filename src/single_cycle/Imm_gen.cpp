@@ -6,7 +6,7 @@ Imm_gen::Imm_gen()
 
 void Imm_gen::set_imm_gen(uint8_t op_code, uint32_t instruction)
 {
-    uint64_t tmp;
+    int64_t tmp;
 
     switch (op_code) {
         case LOAD:     
