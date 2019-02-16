@@ -65,6 +65,7 @@ private:
 	uint8_t write_data;
 	uint64_t read_data1;
 	uint64_t read_data2;
+	uint64_t mux_read_data2;
 
 	/* Control signals */
 	bool branch;
