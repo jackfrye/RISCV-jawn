@@ -56,7 +56,7 @@ Control::Control(uint8_t _op_code)
 	}
     else if(op_code == I_FORMAT) // I-Format
     {
-		alu_src = 0;
+		alu_src = 1;
 		mem_to_reg = 0;
 		reg_write = 1;
 		mem_read = 1;
@@ -127,7 +127,7 @@ void Control::set_op_code(uint8_t _op_code)
 	}
     else if(op_code == I_FORMAT) // I-Format
     {
-		alu_src = 0;
+		alu_src = 1;
 		mem_to_reg = 0;
 		reg_write = 1;
 		mem_read = 1;

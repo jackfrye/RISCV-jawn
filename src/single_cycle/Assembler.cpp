@@ -1,4 +1,5 @@
 #include "Assembler.h"
+#include <iostream>
 
 Assembler::Assembler(Instruction_Memory *instr_mem, const string trace_fname) : 
 	instr_mem (instr_mem),
@@ -227,7 +228,7 @@ void Assembler::write_into_instr_mem()
 				string imme = line.substr(pos, end - pos);
 
 				int immediate = stoi(imme, &pos, 0);
-
+				
 				// Extract rs1
 				pos = line.find_first_of('(', 0) + 1;
 				end = line.find_first_of(')', 0);
@@ -279,6 +280,7 @@ void Assembler::write_into_instr_mem()
 				string imme = line.substr(pos, line.size() - pos);
 				
 				int immediate = stoi(imme, &pos, 0);
+
 				instr.instruction |= (immediate << (7 + 5 + 3 + 5));
 			}
 			else if (opr == "sd")
