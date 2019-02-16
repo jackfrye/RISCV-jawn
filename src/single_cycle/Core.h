@@ -32,6 +32,17 @@ public:
 		instr_mem->printInstr();
 	}
 
+	void printMem()
+	{
+		cout << "Core " << id << " : " << endl;
+		data_memory->print_mem(out);
+	}
+
+	void printRegs()
+	{
+		registers->printRegs(out);
+	}
+
 private:
 
 	ofstream *out; // Output file
