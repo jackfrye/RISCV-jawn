@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <bitset>
+#include <iostream>
 
 #include "Data_Memory.h"
 
@@ -20,4 +21,13 @@ unsigned int Data_Memory::read_data(long address)
 {
 
 	return data.find(address)->second;
+}
+
+void Data_Memory::print_mem(ofstream *out)
+{
+	for(map<long, unsigned int>::iterator it = data.begin(); it != data.end(); it++)
+	{
+		bitset<32> x1(it->second);
+		*out << it->first << ": " << x1 << endl;
+	}
 }
