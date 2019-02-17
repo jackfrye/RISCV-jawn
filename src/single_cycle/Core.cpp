@@ -35,9 +35,6 @@ bool Core::tick()
 		// Get Instruction
 		Instruction &instruction = instr_mem->get_instruction(PC);
 
-        bitset<32> x(instruction.instruction);
-        cout << "Instruction: " << x << "\n";
-
 		// Increment PC
 		// TODO, PC should be incremented or decremented based on instruction
 		read_register1 = (instruction.instruction >> 15) & 0x1F;
@@ -45,22 +42,6 @@ bool Core::tick()
 		write_register = (instruction.instruction >> 7) & 0x1F;
 	    read_data1 = registers->read_reg((int)read_register1);
 		read_data2 = registers->read_reg((int)read_register2);
-
-
-#if 1
-        bitset<8> x1(read_register1);
-        cout << "Read reg " << x1 << "\n";
-        bitset<8> x2(read_register2);
-        cout << "Read reg " << x2 << "\n";
-        bitset<8> x3(write_register);
-        cout << "Write reg " << x3 << "\n";
-        bitset<8> x4(write_data);
-        cout << "Write data " << x4 << "\n";
-        bitset<64> x5(read_data1);
-        cout << "Read data1 " << x5 << "\n";
-        bitset<64> x6(read_data2);
-        cout << "Read data2 " << x6 << "\n";
-#endif
 
 		op_code = instruction.instruction & 0x007F;
 		bitset<8> t(op_code);
@@ -76,32 +57,22 @@ bool Core::tick()
 		alu_src = control->get_alu_src();
 		reg_write = control->get_reg_write();
 
-		*out << "Branch: " << (int)branch << endl;
-		*out << "Mem Read: " << (int)mem_read << endl;
-		*out << "Mem to reg: " << (int)mem_to_reg << endl;
-		*out << "ALU Op 0: " << (int)alu_op_0 << endl;
-		*out << "ALU Op 1: " << (int)alu_op_1 << endl;
-		*out << "Mem Write: " << (int)mem_write << endl;
-		*out << "ALU src: " << (int)alu_src << endl;
-		*out << "Reg write: " << (int)reg_write << endl;
-
         funct7 = (instruction.instruction >> 25) & 0x7F;
         funct3 = (instruction.instruction >> 12) & 0x7;
 
         imm_gen->set_imm_gen(op_code, instruction.instruction);
         imm_gen_result = imm_gen->get_imm_gen_result();
-	cout << "IMM GEN RESULT: " << imm_gen_result << endl;
 
-	// ALU Mux
+        // ALU Mux
         if (alu_src) {
             mux_read_data2 = imm_gen_result;
         }
-	else
-	{
-		mux_read_data2 = read_data2;
-	}
+        else
+        {
+            mux_read_data2 = read_data2;
+        }
 
-	alu->set_alu_ops( read_data1, mux_read_data2, alu_op_0, alu_op_1, funct7, funct3);
+	    alu->set_alu_ops( read_data1, mux_read_data2, alu_op_0, alu_op_1, funct7, funct3);
         alu_out = alu->get_alu_result();
         alu_zero = alu->get_alu_is_zero();
 
@@ -113,14 +84,10 @@ bool Core::tick()
             data_mem_read = data_memory->read_data(alu_out);
         }
         
-	*out << "data_mem_read: " << data_mem_read << endl;
-	*out << "alu_out: " << alu_out << endl;
-
         uint64_t tmp;
         tmp = (mem_to_reg) ? data_mem_read : alu_out;
         
         if (reg_write) {
-		*out << "Writing reg, value: " << tmp << endl;
             registers->assign_reg(write_register, tmp);
         }
 
@@ -175,9 +142,7 @@ void Core::printStats(list<Instruction>::iterator &ite)
 	*out << "Core ID: " << id << "; ";
 	*out << "Begin Exe: " << ite->begin_exe << "; ";
 	*out << "End Exe: " << ite->end_exe << endl;
-	printMem();	
-	printRegs();
-	
-
+	//printMem();	
+	//printRegs();
 }
 

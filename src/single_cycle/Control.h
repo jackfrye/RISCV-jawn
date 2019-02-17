@@ -6,7 +6,7 @@
 #define R_FORMAT 0x33
 #define LOAD     0x03
 #define STORE    0x23
-#define BRANCH   0x36
+#define BRANCH   0x63
 #define I_FORMAT 0x13
 
 class Control

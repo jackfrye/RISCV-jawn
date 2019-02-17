@@ -12,15 +12,6 @@ void Algo_Logic_Unit::set_alu_ops(uint64_t op_1, uint64_t op_2, bool alu_op_0, b
 {
     uint64_t tmp_result;
 
-	cout << "op_1: " << op_1 << endl;
-	cout << "op_2: " << op_2 << endl;
-	cout << "alu_op_0: " << alu_op_0 << endl;
-	cout << "alu_op_1: " << alu_op_1 << endl;
-	bitset<8> f7(funct7);
-	cout << "funct7: " << f7 << endl;
-	bitset<8> f3(funct3);
-	cout << "funct3: " << f3 << endl;
-
     if (!alu_op_1 && !alu_op_0) { // ALUop 00 (Load/Store)
         tmp_result = op_1 + op_2;
     }
@@ -54,7 +45,5 @@ void Algo_Logic_Unit::set_alu_ops(uint64_t op_1, uint64_t op_2, bool alu_op_0, b
         }
     }
     alu_result = tmp_result;
-    cout << "ALU RESULTS: " << alu_result << endl;
-	
 }
 
