@@ -55,7 +55,6 @@ void Algo_Logic_Unit::set_alu_ops(int64_t op_1, int64_t op_2, bool alu_op_0, boo
             default:  tmp_result = -1;           break;
         }
     }
-    cout << "ALU out: " << tmp_result << "\n";
     alu_result = tmp_result;
 }
 

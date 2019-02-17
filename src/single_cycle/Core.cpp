@@ -35,6 +35,10 @@ bool Core::tick()
 		// Get Instruction
 		Instruction &instruction = instr_mem->get_instruction(PC);
 
+        bitset<32> instr(instruction.instruction);
+
+        cout << "Instruction: " << instr << "\n";
+
 		// Increment PC
 		// TODO, PC should be incremented or decremented based on instruction
 		read_register1 = (instruction.instruction >> 15) & 0x1F;
@@ -48,6 +52,7 @@ bool Core::tick()
 		*out << "OPCODE: " << t << endl;
 		control->set_op_code(op_code);
 		
+        jump = control->get_jump();
 		branch = control->get_branch();
 		mem_read = control->get_mem_read();
 		mem_to_reg = control->get_mem_to_reg();
@@ -63,39 +68,45 @@ bool Core::tick()
         imm_gen->set_imm_gen(op_code, instruction.instruction);
         imm_gen_result = imm_gen->get_imm_gen_result();
 
-        // ALU Mux
-        if (alu_src) {
-            mux_read_data2 = imm_gen_result;
-        }
-        else
-        {
-            mux_read_data2 = read_data2;
-        }
-
-	    alu->set_alu_ops( read_data1, mux_read_data2, alu_op_0, alu_op_1, funct7, funct3);
-        alu_out = alu->get_alu_result();
-        alu_zero = alu->get_alu_is_zero();
-
-        if (mem_write) {
-            data_memory->write_data(alu_out, read_data2);
-        }
-
-        if (mem_read) {
-            data_mem_read = data_memory->read_data(alu_out);
-        }
-        
-        uint64_t tmp;
-        tmp = (mem_to_reg) ? data_mem_read : alu_out;
-        
-        if (reg_write) {
-            registers->assign_reg(write_register, tmp);
-        }
-
-        if (branch && alu_zero) {
-            PC = PC + imm_gen_result;
+        if (jump) {
+            registers->assign_reg(write_register, PC+4);
+            PC = imm_gen_result;
         }
         else {
-            PC += 4;
+            // ALU Mux
+            if (alu_src) {
+                mux_read_data2 = imm_gen_result;
+            }
+            else
+            {
+                mux_read_data2 = read_data2;
+            }
+
+            alu->set_alu_ops( read_data1, mux_read_data2, alu_op_0, alu_op_1, funct7, funct3);
+            alu_out = alu->get_alu_result();
+            alu_zero = alu->get_alu_is_zero();
+
+            if (mem_write) {
+                data_memory->write_data(alu_out, read_data2);
+            }
+
+            if (mem_read) {
+                data_mem_read = data_memory->read_data(alu_out);
+            }
+            
+            uint64_t tmp;
+            tmp = (mem_to_reg) ? data_mem_read : alu_out;
+            
+            if (reg_write) {
+                registers->assign_reg(write_register, tmp);
+            }
+
+            if (branch && alu_zero) {
+                PC = PC + imm_gen_result;
+            }
+            else {
+                PC += 4;
+            }
         }
 
 		/*
