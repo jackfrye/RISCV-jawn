@@ -12,6 +12,7 @@ Control::Control(uint8_t _op_code)
 	op_code = _op_code;
 	if(op_code == R_FORMAT) // R-Format
 	{
+        jalr = 0;
         jump = 0;
 		alu_src = 0;
 		mem_to_reg = 0;
@@ -24,6 +25,7 @@ Control::Control(uint8_t _op_code)
 	}
 	else if(op_code == LOAD) // load double word
 	{
+        jalr = 0;
         jump = 0;
 		alu_src = 1;
 		mem_to_reg = 1;
@@ -36,6 +38,7 @@ Control::Control(uint8_t _op_code)
 	}
 	else if(op_code == STORE) // store double word
 	{
+        jalr = 0;
         jump = 0;
 		alu_src = 1;
 		mem_to_reg = -1;
@@ -48,6 +51,7 @@ Control::Control(uint8_t _op_code)
 	}
 	else if(op_code == BRANCH) // branch if equal
 	{
+        jalr = 0;
         jump = 0;
 		alu_src = 0;
 		mem_to_reg = -1;
@@ -60,6 +64,7 @@ Control::Control(uint8_t _op_code)
 	}
     else if(op_code == I_FORMAT) // I-Format
     {
+        jalr = 0;
         jump = 0;
 		alu_src = 1;
 		mem_to_reg = 0;
@@ -72,27 +77,29 @@ Control::Control(uint8_t _op_code)
     }
     else if(op_code == JAL)
     {
+        jalr = 0;
         jump = 1;
 		alu_src = 0;
 		mem_to_reg = 0;
 		reg_write = 0;
 		mem_read = 0;
 		mem_write = 0;
-		branch = 1;
-		alu_op_1 = 1;
-		alu_op_0 = 1;
+		branch = 0;
+		alu_op_1 = 0;
+		alu_op_0 = 0;
     }
     else if(op_code == JALR)
     {
+        jalr = 1;
         jump = 0;
 		alu_src = 0;
 		mem_to_reg = 0;
 		reg_write = 0;
 		mem_read = 0;
 		mem_write = 0;
-		branch = 1;
-		alu_op_1 = 1;
-		alu_op_0 = 1;
+		branch = 0;
+		alu_op_1 = 0;
+		alu_op_0 = 0;
     }
 	else
 	{
@@ -113,6 +120,7 @@ void Control::set_op_code(uint8_t _op_code)
 	op_code = _op_code;
 	if(op_code == R_FORMAT) // R-Format
 	{
+        jalr = 0;
         jump = 0;
 		alu_src = 0;
 		mem_to_reg = 0;
@@ -125,6 +133,7 @@ void Control::set_op_code(uint8_t _op_code)
 	}
 	else if(op_code == LOAD) // load double word
 	{
+        jalr = 0;
         jump = 0;
 		alu_src = 1;
 		mem_to_reg = 1;
@@ -137,6 +146,7 @@ void Control::set_op_code(uint8_t _op_code)
 	}
 	else if(op_code == STORE) // store double word
 	{
+        jalr = 0;
         jump = 0;
 		alu_src = 1;
 		mem_to_reg = -1;
@@ -149,6 +159,7 @@ void Control::set_op_code(uint8_t _op_code)
 	}
 	else if(op_code == BRANCH) // branch if equal
 	{
+        jalr = 0;
         jump = 0;
 		alu_src = 0;
 		mem_to_reg = -1;
@@ -161,6 +172,7 @@ void Control::set_op_code(uint8_t _op_code)
 	}
     else if(op_code == I_FORMAT) // I-Format
     {
+        jalr = 0;
         jump = 0;
 		alu_src = 1;
 		mem_to_reg = 0;
@@ -173,6 +185,7 @@ void Control::set_op_code(uint8_t _op_code)
     }
     else if(op_code == JAL)
     {
+        jalr = 0;
         jump = 1;
 		alu_src = 0;
 		mem_to_reg = 0;
@@ -185,6 +198,7 @@ void Control::set_op_code(uint8_t _op_code)
     }
     else if(op_code == JALR)
     {
+        jalr = 1;
         jump = 0;
 		alu_src = 0;
 		mem_to_reg = 0;
@@ -206,6 +220,11 @@ void Control::set_op_code(uint8_t _op_code)
 		alu_op_1 = 0;
 		alu_op_0 = 0;
 	}
+}
+
+bool Control::get_jalr()
+{
+    return jalr;
 }
 
 bool Control::get_jump()
