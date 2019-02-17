@@ -68,6 +68,7 @@ private:
 	int64_t mux_read_data2;
 
 	/* Control signals */
+    bool jump;
 	bool branch;
 	bool mem_read;
 	bool mem_to_reg;

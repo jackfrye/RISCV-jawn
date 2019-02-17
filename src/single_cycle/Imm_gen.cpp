@@ -26,10 +26,10 @@ void Imm_gen::set_imm_gen(uint8_t op_code, uint32_t instruction)
             }
             break;
         case JAL:
-            tmp  = ((instruction << 31) & 0x1)   << 20;  // Instruction[31]
-            tmp |= ((instruction << 12) & 0x3FF) << 10;  // Instruction[21:12]
-            tmp |= ((instruction << 22) & 0x1)   <<  9;  // Instruction[22]
-            tmp |= ((instruction << 23) & 0x7F);         // Instruction[30:23]
+            tmp  = ((instruction >> 21) & 0x3FF);      // Instruction[30:21]
+            tmp |= ((instruction >> 20) & 0x1)  << 10; // Instruction[20]
+            tmp |= ((instruction >> 12) & 0xFF) << 11; // Instruction[19:12]
+            tmp |= ((instruction >> 31) & 0x1)  << 19; // Instruction[31]
 
             if (tmp & 0x80000) {
                 tmp |= ~0xFFFFF;
@@ -42,6 +42,7 @@ void Imm_gen::set_imm_gen(uint8_t op_code, uint32_t instruction)
             if (tmp & 800) {
                 tmp |= ~0xFFF;
             }
+            tmp = tmp << 1;
             break;
         case BRANCH:
             tmp  = ((instruction >> 31) & 0x1)  << 11; // Instruction[31]
