@@ -92,7 +92,7 @@ bool Core::tick()
         }
 
         if (branch && alu_zero) {
-            PC = PC + imm_gen_result << 1;
+            PC = PC + imm_gen_result;
         }
         else {
             PC += 4;
