@@ -8,6 +8,8 @@
 #define STORE    0x23
 #define BRANCH   0x63
 #define I_FORMAT 0x13
+#define JAL      0x6F
+#define JALR     0x67
 
 class Control
 {

@@ -20,6 +20,9 @@ void Algo_Logic_Unit::set_alu_ops(uint64_t op_1, uint64_t op_2, bool alu_op_0, b
     if (!alu_op_1 && !alu_op_0) { // ALUop 00 (Load/Store)
         tmp_result = op_1 + op_2;
     }
+    else if (alu_op_1 && alu_op_0) { // Jump
+        is_zero = 1;
+    }
     else if (!alu_op_1 && alu_op_0) { // ALUop 01 (BEQ)
         switch (funct3) {
             case BEQ:
@@ -39,7 +42,6 @@ void Algo_Logic_Unit::set_alu_ops(uint64_t op_1, uint64_t op_2, bool alu_op_0, b
             default:
                 is_zero = 0;
                 break;
-
         }
     }
     else if (alu_op_1 && !alu_op_0) { // ALUop 10 (R-type or I-type)

@@ -65,6 +65,28 @@ Control::Control(uint8_t _op_code)
 		alu_op_1 = 1;
 		alu_op_0 = 0;
     }
+    else if(op_code == JAL)
+    {
+		alu_src = 0;
+		mem_to_reg = 0;
+		reg_write = 0;
+		mem_read = 0;
+		mem_write = 0;
+		branch = 1;
+		alu_op_1 = 1;
+		alu_op_0 = 1;
+    }
+    else if(op_code == JALR)
+    {
+		alu_src = 0;
+		mem_to_reg = 0;
+		reg_write = 0;
+		mem_read = 0;
+		mem_write = 0;
+		branch = 1;
+		alu_op_1 = 1;
+		alu_op_0 = 1;
+    }
 	else
 	{
 		alu_src = 0;
