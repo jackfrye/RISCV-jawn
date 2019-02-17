@@ -20,7 +20,13 @@ void Imm_gen::set_imm_gen(uint8_t op_code, uint32_t instruction)
             tmp  = ((instruction >> 31) & 0x1)  << 11; // Instruction[31]
             tmp |= ((instruction >> 7)  & 0x1)  << 10; // Instruction[7]
             tmp |= ((instruction >> 25) & 0x3F) << 4;  // Instruction[30:25]
-            tmp |= ((instruction >> 8)  & 0x7);        // Instruction[11:8]
+            tmp |= ((instruction >> 8)  & 0xF);        // Instruction[11:8]
+    
+            if (tmp & 0x800) {
+                tmp |= ~0xFFF;
+            }
+            tmp = tmp << 1;
+
             break;
         case I_FORMAT:
             uint8_t funct3;
@@ -37,5 +43,6 @@ void Imm_gen::set_imm_gen(uint8_t op_code, uint32_t instruction)
             tmp = 0;
             break;
     }
+
     imm_gen_out = tmp;
 }
