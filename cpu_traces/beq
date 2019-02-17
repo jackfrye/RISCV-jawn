@@ -1,0 +1,6 @@
+addi x8, x0, 5
+addi x2, x0, 5
+beq x2, x8, 12
+addi x8, x0, 5
+addi x8, x0, 5
+addi x8, x8, 5
