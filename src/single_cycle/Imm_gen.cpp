@@ -34,7 +34,6 @@ void Imm_gen::set_imm_gen(uint8_t op_code, uint32_t instruction)
             if (tmp & 0x80000) {
                 tmp |= ~0xFFFFF;
             }
-            tmp = tmp << 1;
             break;
         case JALR:
             tmp = (instruction >> 20) & 0xFFF; // Instruction[31:20]
