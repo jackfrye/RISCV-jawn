@@ -1,0 +1,172 @@
+main:
+	addi x5, x0, 0
+	addi x6, x0, 0
+	addi x10, x5, 0 // *mat
+	sd x6, 0(x5) // mat[0]
+	add x6, x6, 1
+	sd x6, 8(x5) // mat[1]
+	add x6, x6, 1
+	sd x6, 16(x5) // mat[2]
+	add x6, x6, 1
+	sd x6, 24(x5) // mat[3]
+	add x6, x6, 1
+	sd x6, 32(x5) // mat[4]
+	add x6, x6, 1
+	sd x6, 40(x5) // mat[5]
+	add x6, x6, 1
+	sd x6, 48(x5) // mat[6]
+	add x6, x6, 1
+	sd x6, 56(x5) // mat[7]
+	add x6, x6, 1
+	sd x6, 64(x5) // mat[8]
+	add x6, x6, 1
+	sd x6, 72(x5) // mat[9]
+	add x6, x6, 1
+	sd x6, 80(x5) // mat[10]
+	add x6, x6, 1
+	sd x6, 88(x5) // mat[11]
+	add x6, x6, 1
+	sd x6, 96(x5) // mat[12]
+	add x6, x6, 1
+	sd x6, 104(x5) // mat[13]
+	add x6, x6, 1
+	sd x6, 112(x5) // mat[14]
+	add x6, x6, 1
+	sd x6, 120(x5) // mat[15]
+	add x6, x5, 8
+	addi x5, x10, 0
+	addi x6, x11, 0
+	jal matrix_opr, 0
+
+
+	
+
+shift:
+	addi x2, x2, -8
+	sd x20, 0(x2)
+	sll x20, x10, x11
+	addi x10, x20, 0
+	ld x20, 0(x2)
+	jalr x0, 0(x1)
+
+
+matrix_opr:
+	addi x2, x2, -24 //move stack pointer
+	sd x11, 16(x2) // save *out
+	sd x10, 8(x2)  // save *mat
+	sd x1, 0(x2)   // save return address
+
+	addi x25, x10, 0 // store *mat
+	addi x26, x11, 0 // store *out
+
+	addi x27, x0, 0 // out[i] = 0	
+	addi x5, x0, 0 // i = 0
+	addi x6, x0, 0 // j = 0
+	ld x10, 0(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0 // run shift(x10, x11)
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 1 // j = 1
+	ld x10, 8(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 1 // j = 2
+	ld x10, 16(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 0 // j = 3
+	ld x10, 24(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+	sd x27, 0(x25) // write to RAM for i=0
+
+	addi x27, x0, 0 // out[i] = 0	
+	addi x5, x5, 1 // i = 1
+	addi x6, x0, 0 // j = 0
+	ld x10, 32(x25) // mat[i*4+j]	
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 1 // j = 1
+	ld x10, 40(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 1 // j = 2
+	ld x10, 48(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 0 // j = 3
+	ld x10, 56(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+	sd x27, 4(x25) // write to RAM for i=1
+
+	addi x27, x0, 0 // out[i] = 0	
+	addi x5, x5, 1 // i = 2
+	addi x6, x0, 0 // j = 0
+	ld x10, 64(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 1 // j = 1
+	ld x10, 72(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 1 // j = 2
+	ld x10, 80(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 0 // j = 3
+	ld x10, 88(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+	sd x27, 8(x25) // write to RAM for i=2
+
+
+	addi x27, x0, 0 // out[i] = 0	
+	addi x5, x5, 1 // i = 3
+	addi x6, x0, 0 // j = 0
+	ld x10, 96(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 1 // j = 1
+	ld x10, 104(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 1 // j = 2
+	ld x10, 112(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+
+	addi x6, x6, 0 // j = 3
+	ld x10, 120(x25) // mat[i*4+j]
+	addi x11, x5, 0 //shift( ------, i)
+	jal shift, 0
+	add x27, x27, x10 // out[i] += ...
+	sd x27, 8(x25) // write to RAM for i=3
+
+	jalr x0, 0(x1) // return to main
+	
