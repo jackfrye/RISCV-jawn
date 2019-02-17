@@ -1,4 +1,5 @@
 #include "Imm_gen.h"
+#include <iostream>
 
 Imm_gen::Imm_gen() 
 {
@@ -59,11 +60,11 @@ void Imm_gen::set_imm_gen(uint8_t op_code, uint32_t instruction)
 
             funct3 = (instruction >> 12) & 0x7;
 
+            tmp = (instruction >> 20) & 0xFFF; // Instruction[31:20]
+
             // For immediate instructions SLLI, SRLI, and SRAI
             if (funct3 == 0x1 || funct3 == 0x5)
                 tmp = (instruction >> 20) & 0x1F;
-
-            tmp = (instruction >> 20) & 0xFFF; // Instruction[31:20]
 
             if (tmp & 800) {
                 tmp |= ~0xFFF;

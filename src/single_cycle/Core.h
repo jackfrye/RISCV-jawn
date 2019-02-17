@@ -65,7 +65,7 @@ private:
 	uint8_t write_data;
 	uint64_t read_data1;
 	uint64_t read_data2;
-	uint64_t mux_read_data2;
+	int64_t mux_read_data2;
 
 	/* Control signals */
 	bool branch;
@@ -84,7 +84,7 @@ private:
 	Control *control;
 
     Imm_gen *imm_gen;
-    uint64_t imm_gen_result;
+    int64_t imm_gen_result;
 
 	Algo_Logic_Unit *alu;
     bool alu_zero;
