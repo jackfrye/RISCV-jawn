@@ -14,6 +14,7 @@ main:
 	addi x2, x2, 1024	// stack pointer after memory for arrays
 
 	jal matrix_opr, 0	// call function
+	jal end, 0
 
 shift:
 	addi x2, x2, -8		// move stack pointer
@@ -43,13 +44,16 @@ matrix_opr:
 	ld x10, 0(x25) 		// shift(arg1)
 	addi x11, x5, 0		// shift(arg2)
 	jal shift, 0 		// call func, result in x10
-	add x27, x27, x10 	// res += shift(..) 
+	add x27, x27, x/10 	// res += shift(..) 
 	addi x6, x6, 1 		// j++
-	blt x6, x7, -40		// j<4 loop
+	addi x25, x25, 8	// next address for index mat
+	blt x6, x7, -24		// j<4 loop
 	addi x5, x5, 1 		// i++
-	ld x28, 0(x27) 		// out[i] = ...+...+...+...
-	addi x6, x0, 0		// out[i] = 0
-	blt x5, x7, -72		// i<4 loop
+	sd x27, 0(x28) 		// out[i] = ...+...+...+...
+	addi x28, x28, 8	// out pointer++
+	addi x6, x0, 0		// j=0
+	addi x27, x27, x0	// out[i] = 0
+	blt x5, x7, -48		// i<4 loop
 	
 	ld x1, 0(x2)		// restore return address
 	ld x10, 8(x10)		// restore arg1
@@ -57,3 +61,5 @@ matrix_opr:
 	addi x2, x2, 24		// restore stack pointer
 
 	jalr x0, 0(x1) 		// return to main
+end:
+	addi x5, x5, 0
