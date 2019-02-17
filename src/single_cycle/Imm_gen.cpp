@@ -65,7 +65,7 @@ void Imm_gen::set_imm_gen(uint8_t op_code, uint32_t instruction)
             if (funct3 == 0x1 || funct3 == 0x5)
                 tmp = (instruction >> 20) & 0x1F;
 
-            if (tmp & 800) {
+            if ((tmp >> 11) & 0x1) {
                 tmp |= ~0xFFF;
             }
             break;
