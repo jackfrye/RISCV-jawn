@@ -92,7 +92,7 @@ bool Core::tick()
         }
 
         if (branch && alu_zero) {
-            PC = PC + imm_gen_result << 1;
+            PC = PC + imm_gen_result;
         }
         else {
             PC += 4;
@@ -142,7 +142,8 @@ void Core::printStats(list<Instruction>::iterator &ite)
 	*out << "Core ID: " << id << "; ";
 	*out << "Begin Exe: " << ite->begin_exe << "; ";
 	*out << "End Exe: " << ite->end_exe << endl;
-	//printMem();	
-	//printRegs();
+	*out << "PC: " << PC << endl;
+	printMem();	
+	printRegs();
 }
 
