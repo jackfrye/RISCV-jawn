@@ -35,10 +35,6 @@ bool Core::tick()
 		// Get Instruction
 		Instruction &instruction = instr_mem->get_instruction(PC);
 
-        bitset<32> instr(instruction.instruction);
-
-        cout << "Instruction: " << instr << "\n";
-
 		// Increment PC
 		// TODO, PC should be incremented or decremented based on instruction
 		read_register1 = (instruction.instruction >> 15) & 0x1F;
@@ -52,6 +48,7 @@ bool Core::tick()
 		*out << "OPCODE: " << t << endl;
 		control->set_op_code(op_code);
 		
+        jalr = control->get_jalr();
         jump = control->get_jump();
 		branch = control->get_branch();
 		mem_read = control->get_mem_read();
@@ -71,6 +68,11 @@ bool Core::tick()
         if (jump) {
             registers->assign_reg(write_register, PC+4);
             PC = imm_gen_result;
+        }
+        if (jalr) {
+            PC = registers->read_reg(read_register1);
+            PC += registers->read_reg(write_register);
+            PC += imm_gen_result;
         }
         else {
             // ALU Mux

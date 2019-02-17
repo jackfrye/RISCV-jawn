@@ -37,12 +37,11 @@ void Imm_gen::set_imm_gen(uint8_t op_code, uint32_t instruction)
             tmp = tmp << 1;
             break;
         case JALR:
-            tmp = (instruction << 20) & 0xFFF; // Instruction[31:20]
+            tmp = (instruction >> 20) & 0xFFF; // Instruction[31:20]
 
-            if (tmp & 800) {
+            if ((tmp >> 11) & 0x1) {
                 tmp |= ~0xFFF;
             }
-            tmp = tmp << 1;
             break;
         case BRANCH:
             tmp  = ((instruction >> 31) & 0x1)  << 11; // Instruction[31]

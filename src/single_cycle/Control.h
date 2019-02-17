@@ -15,6 +15,7 @@ class Control
 {
 private:
     bool jump; // jump hack
+    bool jalr; // jalr hack
 	bool branch;
 	bool mem_read;
 	bool mem_to_reg;
@@ -29,6 +30,7 @@ public:
 	Control();
 	Control(uint8_t);
 	void set_op_code(uint8_t);
+    bool get_jalr();
     bool get_jump();
 	bool get_branch();
 	bool get_mem_read();
