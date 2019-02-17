@@ -10,8 +10,8 @@ main:
 	addi x5, x5, 8		// address pointer
 	blt x5, x7, -12		// i<16 loop
 	
-	addi x5, x5, 8		// address *out init
 	addi x11, x5, 0		// matrix_opr(arg2) *out 
+	addi x2, x2, 160	// stack pointer after memory for arrays
 
 	jal matrix_opr, 0	// call function
 

@@ -6,8 +6,8 @@ sd x6, 0(x5)
 addi x6, x6, 1
 addi x5, x5, 8
 blt x5, x7, -12
-addi x5, x5, 8
 addi x11, x5, 0
+addi x2, x2, 160
 jal x1, 72
 addi x2, x2, -8
 sd x20, 0(x2)
