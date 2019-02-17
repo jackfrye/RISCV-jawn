@@ -11,7 +11,7 @@ main:
 	blt x5, x7, -12		// i<16 loop
 	
 	addi x11, x5, 0		// matrix_opr(arg2) *out 
-	addi x2, x2, 160	// stack pointer after memory for arrays
+	addi x2, x2, 1024	// stack pointer after memory for arrays
 
 	jal matrix_opr, 0	// call function
 
