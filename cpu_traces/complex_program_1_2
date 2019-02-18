@@ -1,15 +1,15 @@
-addi x5, x0, 0
-addi x6, x0, 0
+addi x5, x0, 64
+addi x6, x0, 8
 addi x7, x0, 128
 addi x10, x5, 0
 sd x6, 0(x5)
 addi x6, x6, 1
 addi x5, x5, 8
 blt x5, x7, -12
-addi x11, x5, 0
-addi x2, x2, 1024
+addi x11, x5, 16
+addi x2, x2, 2048
 jal x1, 76
-jal x1, 192
+jal x1, 196
 addi x2, x2, -8
 sd x20, 0(x2)
 sll x20, x10, x11
@@ -28,6 +28,7 @@ addi x28, x26, 0
 addi x5, x0, 0
 addi x6, x0, 0
 addi x7, x0, 4
+addi x8, x0, 2
 ld x10, 0(x25)
 addi x11, x5, 0
 jal x1, 48
@@ -40,7 +41,7 @@ sd x27, 0(x28)
 addi x28, x28, 8
 addi x6, x0, 0
 addi x27, x0, 0
-blt x5, x7, -48
+blt x5, x8, -48
 ld x1, 0(x2)
 ld x10, 8(x10)
 ld x11, 16(x11)

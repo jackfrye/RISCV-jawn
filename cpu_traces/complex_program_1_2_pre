@@ -1,0 +1,65 @@
+main:
+	addi x5, x0, 64		// address *mat init
+	addi x6, x0, 8		// mat[i] data init
+	addi x7, x0, 128	// i<8 max
+
+	addi x10, x5, 0 	// matrix_opr(arg1) *mat
+
+	sd x6, 0(x5) 		// mat[8 - 15]
+	addi x6, x6, 1		// mat[i] = i
+	addi x5, x5, 8		// address pointer
+	blt x5, x7, -12		// i<16 loop
+	
+	addi x11, x5, 16	// matrix_opr(arg2) *out 
+	addi x2, x2, 2048	// stack pointer after memory for arrays CORE 1
+
+	jal matrix_opr, 0	// call function
+	jal end, 0
+
+shift:
+	addi x2, x2, -8		// move stack pointer
+	sd x20, 0(x2)		// move return reg to stack
+	sll x20, x10, x11	// return arg1 << arg2
+	addi x10, x20, 0	// put in x10 for return
+	ld x20, 0(x2)		// restore stack variables
+	addi x2, x2, 8		// restore stack pointer
+	jalr x0, 0(x1)
+
+matrix_opr:
+	addi x2, x2, -24 	//move stack pointer
+	sd x11, 16(x2) 		// save *out
+	sd x10, 8(x2)  		// save *mat
+	sd x1, 0(x2)   		// save return sp address
+
+	addi x25, x10, 0 	// store *mat
+	addi x26, x11, 0 	// store *out
+	addi x27, x0, 0 	// current sum
+	addi x28, x26, 0 	// current pointer in out array 
+
+	addi x5, x0, 0 		// i = 0
+	addi x6, x0, 0 		// j = 0
+	addi x7, x0, 4 		//j max
+	addi x8, x0, 2		// i max 2 CORES
+
+	ld x10, 0(x25) 		// shift(arg1)
+	addi x11, x5, 0		// shift(arg2)
+	jal shift, 0 		// call func, result in x10
+	add x27, x27, x/10 	// res += shift(..) 
+	addi x6, x6, 1 		// j++
+	addi x25, x25, 8	// next address for index mat
+	blt x6, x7, -24		// j<4 loop
+	addi x5, x5, 1 		// i++
+	sd x27, 0(x28) 		// out[i] = ...+...+...+...
+	addi x28, x28, 8	// out pointer++
+	addi x6, x0, 0		// j=0
+	addi x27, x27, x0	// out[i] = 0
+	blt x5, x8, -48		// i<4 loop
+	
+	ld x1, 0(x2)		// restore return address
+	ld x10, 8(x10)		// restore arg1
+	ld x11, 16(x11)		// restore arg2
+	addi x2, x2, 24		// restore stack pointer
+
+	jalr x0, 0(x1) 		// return to main
+end:
+	addi x5, x5, 0
