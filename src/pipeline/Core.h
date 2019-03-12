@@ -8,6 +8,11 @@
 
 #include "Instruction.h"
 #include "Stages.h"
+#include "Registers.h"
+#include "Control.h"
+#include "ALU.h"
+#include "Imm_gen.h"
+#include "Data_Memory.h"
 
 #define DEBUG 1
 
@@ -35,6 +40,12 @@ private:
 	ofstream *out; // Output file
 
 	unsigned long long int clk;
+
+	Registers *registers;
+	Control *control;
+    	Imm_gen *imm_gen;
+	Algo_Logic_Unit *alu;	
+    	Data_Memory *data_memory;
 
 	/*
 		Group One: Add Stages here.

@@ -10,6 +10,11 @@
 
 #include "Instruction_Memory.h"
 #include "Instruction.h"
+#include "Registers.h"
+#include "Control.h"
+#include "ALU.h"
+#include "Imm_gen.h"
+#include "Data_Memory.h"
 
 using namespace std;
 
@@ -69,12 +74,8 @@ public:
         struct Register
         {
                 int valid; // Is content inside register valid?
-
-                int WB; // Is WB required?
-
-                int rd_index;
-                int rs_1_index;
-                int rs_2_index;
+		long addr;
+		unsigned int instr;
 	};
         
 	Register if_id_reg;
@@ -88,6 +89,13 @@ public:
                 id_ex_reg.valid = 0;
         }
 
+	ID_Stage(Registers *_regs, Control *_control, Imm_gen *_imm_gen) : stall(0), end(0)
+        {
+		regs = _regs;
+		control = _control;
+		imm_gen = _imm_gen;
+                id_ex_reg.valid = 0;
+        }
         void tick();
 
         /*
@@ -113,10 +121,13 @@ public:
         EX_Stage *ex_stage;
 	MEM_Stage *mem_stage;
 
+
 	/*
 	 * TODO, design components of ID stage here.
 	 * */
-
+	Registers *regs;
+	Control *control;
+	Imm_gen *imm_gen;
         /*
          * TODO, define your ID/EX register here.
          * */
@@ -128,11 +139,28 @@ public:
         {
                 int valid; // Is content inside register valid?
 
-                int WB; // Is WB required?
+                bool branch;
+		bool mem_read;
+		bool mem_to_reg;
+		bool alu_op_0;
+		bool alu_op_1;
+		bool mem_write;
+		bool alu_src;
+		bool reg_write;
 
+		uint64_t data1;
+		uint64_t data2;
                 int rd_index;
                 int rs_1_index;
 		int rs_2_index;
+		uint64_t imm_gen;
+		long addr;
+
+		bool jump;
+		bool jalr;
+
+	    	uint8_t funct7;
+    		uint8_t funct3;
 	};
         Register id_ex_reg;
 };
@@ -158,11 +186,13 @@ public:
 	/*
          * Related Class
          * */
+	IF_Stage *if_stage;
         ID_Stage *id_stage;
 
 	/*
 	 * TODO, design components of EX stage here.
 	 * */
+	Algo_Logic_Unit *alu;
 
         /*
          * TODO, define your EX/MEM register here.
@@ -175,11 +205,18 @@ public:
         {
                 int valid; // Is content inside register valid?
 
-                int WB; // Is WB required?
+                uint64_t alu_out;
+		int write_reg_addr;
+		bool alu_zero;
+		int read_reg2;
 
-                int rd_index;
-                int rs_1_index;
-                int rs_2_index;
+		bool branch;
+		bool mem_read;
+		bool mem_to_reg;
+		bool mem_write;
+		bool reg_write;
+
+		long add_sum;
         };
         Register ex_mem_reg;
 };
