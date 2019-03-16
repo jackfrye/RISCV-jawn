@@ -72,6 +72,7 @@ void ID_Stage::hazard_detection()
 	 * (3) MEM/WB.rd = ID/EX.rs1
 	 * (4) MEM/WB.rd = ID/EX.rs2
 	 * */
+	/*
 	if (ex_stage->ex_mem_reg.valid == 1)
 	{
 		if (ex_stage->ex_mem_reg.rd_index == id_ex_reg.rs_1_index || 
@@ -104,6 +105,8 @@ void ID_Stage::hazard_detection()
 	if_stage->stall = 0; // No hazard found, fetching proceed.
 	stall = 0; // No hazard found, ID stage proceed.
 	ex_stage->bubble = 0; // No hazard found, execution proceed.
+	*/
+
 }
 
 void ID_Stage::tick()
@@ -140,7 +143,7 @@ void ID_Stage::tick()
 	uint8_t op_code = if_stage->if_id_reg.instr & 0x007F;
 	control->set_op_code(op_code);
         imm_gen->set_imm_gen(op_code, if_stage->if_id_reg.instr);
-        imm_gen_result = imm_gen->get_imm_gen_result();	
+        int64_t imm_gen_result = imm_gen->get_imm_gen_result();	
 	
         id_ex_reg.jalr = control->get_jalr();
         id_ex_reg.jump = control->get_jump();
@@ -206,6 +209,7 @@ void EX_Stage::tick()
             ex_mem_reg.write_reg_addr = id_stage->id_ex_reg.imm_gen;
 	    
         }
+
         if (id_stage->id_ex_reg.jalr) {
             PC = registers->read_reg(read_register1);
             PC += registers->read_reg(write_register);
@@ -232,13 +236,13 @@ void EX_Stage::tick()
 	ex_mem_reg.mem_write = id_stage->id_ex_reg.mem_write;
 	ex_mem_reg.reg_write = id_stage->id_ex_reg.reg_write;
 	ex_mem_reg.mem_to_reg = id_stage->id_ex_reg.mem_to_reg;
+
 	ex_mem_reg.add_sum = id_stage->id_ex_reg.addr + id_stage->id_ex_reg.imm_gen;
 	ex_mem_reg.alu_zero = alu->get_alu_is_zero();
 	ex_mem_reg.alu_out = alu->get_alu_result();
 	ex_mem_reg.write_reg_addr = id_stage->id_ex_reg.rd_index;
 	ex_mem_reg.read_reg2 = id_stage->id_ex_reg.data2;
 	}
-
 
 
 	/*
@@ -271,14 +275,32 @@ void MEM_Stage::tick()
 
 	instr = ex_stage->instr; // instruction pointer is also propagated from IF stage
 	
-	mem_wb_reg.valid = ex_stage->ex_mem_reg.valid;
-	ex_stage->ex_mem_reg.valid = 0;
+	mem_wb_reg.valid = 0;
+	mem_wb_reg.reg_write = ex_stage->ex_mem_reg.reg_write;
+	mem_wb_reg.mem_to_reg = ex_stage->ex_mem_reg.mem_to_reg;
+	mem_wb_reg.alu_out = ex_stage->ex_mem_reg.alu_out;
+	mem_wb_reg.data_mem_read = 0;
+	mem_wb_reg.wrie_reg_addr = ex_stage->ex_mem_reg.write_reg_addr;
 
-	mem_wb_reg.WB = ex_stage->ex_mem_reg.WB;
+	// Branch back to IF stage
+	if(ex_stage->ex_mem_reg.branch && ex_stage->ex_mem_reg.alu_zero)
+	{
+		if_stage->PC = ex_stage->ex_mem_reg.add_sum;
+	}
 
-	mem_wb_reg.rd_index = ex_stage->ex_mem_reg.rd_index;
-	mem_wb_reg.rs_1_index = ex_stage->ex_mem_reg.rs_1_index;
-	mem_wb_reg.rs_2_index = ex_stage->ex_mem_reg.rs_2_index;
+	// Write to data memory
+	if(ex_stage->ex_mem_reg.mem_write)
+	{
+		data_mem->write_data(ex_stage-<ex_mem_reg.alu_out, ex_stage->ex_mem_reg.read_reg2);
+	}
+
+	// Read from data memory
+	if(ex_stage->ex_mem_read.mem_read)
+	{
+		mem_wb_reg.data_mem_read = data_memory->read_data(ex_stage->ex_mem_reg.alu_out);
+	}
+
+	
 
 	/*
 	 * De-bugging
@@ -302,6 +324,18 @@ void WB_Stage::tick()
                 // MEM_WB register is invalid, do nothing.
                 return;
         }
+
+	if(mem_stage->mem_wb_reg.reg_write)
+	{
+		if(mem_stage->mem_wb_reg.mem_to_reg)
+		{
+			id_stage->regs->assign_reg(mem_stage->mem_wb_reg.write_reg_addr, mem_stage->mem_wb_reg.data_mem_read);
+		}
+		else
+		{
+			id_stage->regs->assign_reg(mem_stage->mem_wb_reg.write_reg_addr, mem_stage->mem_wb_reg.alu_out);
+		}
+	}
 
 	
 	/*

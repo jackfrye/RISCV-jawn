@@ -40,6 +40,7 @@ public:
 	{
 		// Initially, IF/ID Register is invalid.
 		if_id_reg.valid = 0;
+
 	}
 
         void tick();
@@ -87,6 +88,9 @@ public:
         ID_Stage() : stall(0), end(0)
         {
                 id_ex_reg.valid = 0;
+		regs = new Registers();
+		control = new Control();
+		imm_gen = new Imm_gen();
         }
 
 	ID_Stage(Registers *_regs, Control *_control, Imm_gen *_imm_gen) : stall(0), end(0)
@@ -171,6 +175,7 @@ public:
         EX_Stage() : bubble(0), end(0)
 	{
                 ex_mem_reg.valid = 0;
+		alu = new Algo_Logic_Unit();
         }
 
         void tick();
@@ -227,6 +232,7 @@ public:
         MEM_Stage() : end(0)
         {
                 mem_wb_reg.valid = 0;
+		data_mem = new Data_Memory();
         }
 
         void tick();
@@ -237,11 +243,13 @@ public:
         list<Instruction>::iterator instr; // Points to the instruction currently in the stage
         
 	int end; // All instructions are exhausted?
-	
+	Data_Memory *data_mem;
 	/*
          * Related Class
          * */
+	IF_Stage *if_stage;
         EX_Stage *ex_stage;
+	
 
 	/*
 	 * TODO, design component of MEM stage here.
@@ -257,12 +265,12 @@ public:
         struct Register
         {
                 int valid; // Is content inside register valid?
-
-                int WB; // Is WB required?
-
-                int rd_index;
-                int rs_1_index;
-                int rs_2_index;
+		uint64_t alu_out;
+		unsigned int data_mem_read;
+		bool reg_write;
+		bool mem_to_reg;
+		int write_reg_addr;
+                
         };
         Register mem_wb_reg;
 };
