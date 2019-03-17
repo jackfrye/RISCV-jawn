@@ -149,6 +149,8 @@ public:
 	{
 		// Initially, IF/ID Register is invalid.
 		if_id_reg.valid = 0;
+        pc_src = false;
+        add_sum = 0;
 	}
 
         void tick();
@@ -193,6 +195,7 @@ public:
         ID_Stage() : stall(0), end(0)
         {
                 id_ex_reg.valid = 0;		
+                id_ex_reg.mem_to_reg = 0;
         }
 
 	/* Modules from Single Cycle */
@@ -241,6 +244,7 @@ public:
         EX_Stage() : bubble(0), end(0)
 	{
                 ex_mem_reg.valid = 0;
+                ex_mem_reg = 0;
         }
 
 	Algo_Logic_Unit alu; 
@@ -281,6 +285,9 @@ public:
         MEM_Stage() : end(0)
         {
                 mem_wb_reg.valid = 0;
+                mem_wb_reg.data_mem_read = 0;
+                mem_wb_reg.mem_to_reg = 0;
+                mem_wb_reg.alu_out = 0;
         }
 
 	Data_Memory data_memory;	
