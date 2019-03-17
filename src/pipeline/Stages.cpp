@@ -368,7 +368,7 @@ void WB_Stage::tick()
 
 	uint64_t tmp;
 	tmp = (mem_stage->mem_wb_reg.mem_to_reg) ? mem_stage->mem_wb_reg.data_mem_read : mem_stage->mem_wb_reg.alu_out;
-    
+
 	if (mem_stage->mem_wb_reg.reg_write)
 	{
 		id_stage->registers.assign_reg(mem_stage->mem_wb_reg.rd_index, tmp);

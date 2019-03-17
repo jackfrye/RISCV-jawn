@@ -244,7 +244,6 @@ public:
         EX_Stage() : bubble(0), end(0)
 	{
                 ex_mem_reg.valid = 0;
-                ex_mem_reg = 0;
         }
 
 	Algo_Logic_Unit alu; 
