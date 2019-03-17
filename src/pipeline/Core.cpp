@@ -16,6 +16,7 @@ Core::Core(const string &fname, ofstream *out) : out(out),
 	wb_stage->id_stage = id_stage;
 
 	mem_stage->ex_stage = ex_stage;
+	mem_stage->if_stage = if_stage;
 	
 	ex_stage->id_stage = id_stage;
 	
