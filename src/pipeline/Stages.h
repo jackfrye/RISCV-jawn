@@ -10,6 +10,10 @@
 
 #include "Instruction_Memory.h"
 #include "Instruction.h"
+#include "Registers.h"
+#include "Imm_gen.h"
+#include "ALU.h"
+#include "Data_Memory.h"
 
 using namespace std;
 
@@ -20,6 +24,116 @@ class ID_Stage;
 class EX_Stage;
 class MEM_Stage;
 class WB_Stage;
+
+
+struct if_id_reg
+{
+        int valid; // Is content inside register valid?
+
+        int WB; // Is WB required?
+
+        int rd_index;
+        int rs_1_index;
+        int rs_2_index;
+
+	long PC;
+	int instruction;
+
+};
+
+
+struct id_ex_reg
+{
+        int valid; // Is content inside register valid?
+
+        int WB; // Is WB required?
+
+        int rd_index;
+        int rs_1_index;
+	int rs_2_index;
+	
+	/* Ex signals */
+	bool alu_op1;
+	bool alu_op2;
+	bool alu_src;
+
+	/* Mem signals */
+	bool branch;
+	bool mem_read;
+	bool mem_write;
+
+	/* WB signals */
+	bool reg_write;
+	bool mem_to_reg;
+
+	long PC;	
+
+	uint64_t read_data1;
+	uint64_t read_data2;
+
+    	int64_t imm_gen_result;
+
+	uint8_t funct7;
+    	uint8_t funct3;
+
+	bool jump;
+	bool jalr;
+	
+};
+
+
+struct ex_mem_reg
+{
+        int valid; // Is content inside register valid?
+
+        int WB; // Is WB required?
+
+        int rd_index;
+        int rs_1_index;
+        int rs_2_index;
+
+	/* Mem signals */
+	bool branch;
+	bool mem_read;
+	bool mem_write;
+
+	/* WB signals */
+	bool reg_write;
+	bool mem_to_reg;
+
+	/* Jump address */
+	int64_t add_sum;
+
+	/* ALU Signals */
+	bool alu_zero;
+    	uint64_t alu_out;
+
+	/* Memory Write Data/Register2 Data */
+	uint64_t read_data2;
+	
+};
+
+struct mem_wb_reg
+{
+        int valid; // Is content inside register valid?
+
+        int WB; // Is WB required?
+
+        int rd_index;
+        int rs_1_index;
+        int rs_2_index;
+
+	/* WB signals */
+	bool reg_write;
+	bool mem_to_reg;
+
+	unsigned int data_mem_read;
+
+	bool alu_zero;
+	uint64_t alu_out;
+	
+};
+
 
 /*
  * The following classes are for demonstration only. You should modify it based on the requirements.
@@ -55,6 +169,8 @@ public:
 	/*
          * TODO, Design components of IF stage here
          * */
+	bool pc_src;
+	int64_t add_sum;
         long PC;
 
         Instruction_Memory *instr_mem;
@@ -66,18 +182,9 @@ public:
 	 * Here shows the prototype of an in-complete IF/ID register. You should 
 	 * extend it further to get a complete IF/ID register.
 	 * */
-        struct Register
-        {
-                int valid; // Is content inside register valid?
 
-                int WB; // Is WB required?
-
-                int rd_index;
-                int rs_1_index;
-                int rs_2_index;
-	};
         
-	Register if_id_reg;
+	struct if_id_reg if_id_reg;
 };
 
 class ID_Stage
@@ -85,8 +192,13 @@ class ID_Stage
 public:
         ID_Stage() : stall(0), end(0)
         {
-                id_ex_reg.valid = 0;
+                id_ex_reg.valid = 0;		
         }
+
+	/* Modules from Single Cycle */
+	Registers registers;
+	Control control;
+	Imm_gen imm_gen;
 
         void tick();
 
@@ -113,10 +225,6 @@ public:
         EX_Stage *ex_stage;
 	MEM_Stage *mem_stage;
 
-	/*
-	 * TODO, design components of ID stage here.
-	 * */
-
         /*
          * TODO, define your ID/EX register here.
          * */
@@ -124,17 +232,7 @@ public:
          * Here shows the prototype of an in-complete ID/EX register. You should extend it further
 	 * to get a complete ID/EX register.
 	 * */
-        struct Register
-        {
-                int valid; // Is content inside register valid?
-
-                int WB; // Is WB required?
-
-                int rd_index;
-                int rs_1_index;
-		int rs_2_index;
-	};
-        Register id_ex_reg;
+        struct id_ex_reg id_ex_reg;
 };
 
 class EX_Stage
@@ -144,6 +242,8 @@ public:
 	{
                 ex_mem_reg.valid = 0;
         }
+
+	Algo_Logic_Unit alu; 
 
         void tick();
 
@@ -171,17 +271,8 @@ public:
 	 * Here shows the prototype of an in-complete EX/MEM register. Extend it further to a 
 	 * complete EX/MEM register.
 	 * */
-        struct Register
-        {
-                int valid; // Is content inside register valid?
 
-                int WB; // Is WB required?
-
-                int rd_index;
-                int rs_1_index;
-                int rs_2_index;
-        };
-        Register ex_mem_reg;
+        struct ex_mem_reg ex_mem_reg;
 };
 
 class MEM_Stage
@@ -191,6 +282,8 @@ public:
         {
                 mem_wb_reg.valid = 0;
         }
+
+	Data_Memory data_memory;	
 
         void tick();
 
@@ -204,6 +297,7 @@ public:
 	/*
          * Related Class
          * */
+	IF_Stage *if_stage;
         EX_Stage *ex_stage;
 
 	/*
@@ -217,17 +311,8 @@ public:
 	 * Here shows the prototype of an in-complete MEM/WB register. Extend it further to get
 	 * a complete MEM/WB register.
 	 * */
-        struct Register
-        {
-                int valid; // Is content inside register valid?
 
-                int WB; // Is WB required?
-
-                int rd_index;
-                int rs_1_index;
-                int rs_2_index;
-        };
-        Register mem_wb_reg;
+        struct mem_wb_reg mem_wb_reg;
 };
 
 class WB_Stage
@@ -256,6 +341,7 @@ public:
 	/*
 	 * TODO, you should write to the register file defined in ID stage. Do you know why?
 	 * */
+
 };
 
 #endif

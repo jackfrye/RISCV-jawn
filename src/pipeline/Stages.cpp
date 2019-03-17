@@ -1,4 +1,7 @@
 #include "Stages.h"
+#include "Instruction.h"
+#include "Registers.h"
+#include "Imm_gen.h"
 
 void IF_Stage::tick()
 {
@@ -23,9 +26,19 @@ void IF_Stage::tick()
 		// Get Instruction
 		Instruction &instruction = instr_mem->get_instruction(PC);
 
+		if_id_reg.PC = PC;
+		if_id_reg.instruction = instruction.instruction;
+
 		// Increment PC
 		// TODO, PC should be incremented or decremented based on instruction
-		PC += 4;
+		if(pc_src == 0)
+		{
+			PC += 4;
+		}
+		else
+		{
+			PC = add_sum;
+		}
 
 		/*
 		 * TODO, fix me. Simulate IF Stage here.
@@ -133,14 +146,40 @@ void ID_Stage::tick()
 	instr = if_stage->instr; // instruction pointer is also propagated from IF stage
 	
 	id_ex_reg.valid = if_stage->if_id_reg.valid;
-
 	id_ex_reg.WB = if_stage->if_id_reg.WB;
-
 	id_ex_reg.rd_index = if_stage->if_id_reg.rd_index;
 	id_ex_reg.rs_1_index = if_stage->if_id_reg.rs_1_index;
 	id_ex_reg.rs_2_index = if_stage->if_id_reg.rs_2_index;
 
 	hazard_detection();
+
+	uint8_t op_code = if_stage->if_id_reg.instruction & 0x007F;
+	control.set_op_code(op_code);
+
+	id_ex_reg.branch = control.get_branch();
+	id_ex_reg.mem_read = control.get_mem_read();
+	id_ex_reg.mem_to_reg = control.get_mem_to_reg();
+	id_ex_reg.alu_op1 = control.get_alu_op_0();
+	id_ex_reg.alu_op2 = control.get_alu_op_1();
+	id_ex_reg.mem_write = control.get_mem_write();
+	id_ex_reg.alu_src = control.get_alu_src();
+	id_ex_reg.reg_write = control.get_reg_write();		
+	
+	id_ex_reg.PC = if_stage->if_id_reg.PC;
+
+	id_ex_reg.read_data1 = registers.read_reg(if_stage->if_id_reg.rs_1_index);
+	id_ex_reg.read_data2 = registers.read_reg(if_stage->if_id_reg.rs_2_index);
+
+	imm_gen.set_imm_gen(op_code, if_stage->if_id_reg.instruction);
+        id_ex_reg.imm_gen_result = imm_gen.get_imm_gen_result();
+
+	id_ex_reg.funct7 = (if_stage->if_id_reg.instruction >> 25) & 0x7F;
+        id_ex_reg.funct3 = (if_stage->if_id_reg.instruction >> 12) & 0x7;
+
+	id_ex_reg.jalr = control.get_jalr();
+        id_ex_reg.jump = control.get_jump();
+
+
 	/*
 	 * De-bugging
 	 * */
@@ -194,6 +233,43 @@ void EX_Stage::tick()
 	ex_mem_reg.rs_1_index = id_stage->id_ex_reg.rs_1_index;
 	ex_mem_reg.rs_2_index = id_stage->id_ex_reg.rs_2_index;
 
+	
+	ex_mem_reg.branch = id_stage->id_ex_reg.branch;
+	ex_mem_reg.mem_read = id_stage->id_ex_reg.mem_read;
+	ex_mem_reg.mem_write = id_stage->id_ex_reg.mem_write;
+	ex_mem_reg.reg_write = id_stage->id_ex_reg.reg_write;
+	ex_mem_reg.mem_to_reg = id_stage->id_ex_reg.mem_to_reg;
+
+	int64_t mux_read_data2;
+	if (id_stage->id_ex_reg.jump) {
+            //registers->assign_reg(write_register, PC+4);
+            //PC = imm_gen_result;
+        }
+        if (id_stage->id_ex_reg.jalr) {
+            //PC = registers->read_reg(read_register1);
+            //PC += registers->read_reg(write_register);
+            //PC += imm_gen_result;
+        }
+        else {
+            // ALU Mux
+            if (id_stage->id_ex_reg.alu_src) {
+                mux_read_data2 = id_stage->id_ex_reg.imm_gen_result;
+            }
+            else
+            {
+                mux_read_data2 = id_stage->id_ex_reg.read_data2;
+            }
+
+            alu.set_alu_ops( id_stage->id_ex_reg.read_data1, mux_read_data2, id_stage->id_ex_reg.alu_op1, id_stage->id_ex_reg.alu_op2, id_stage->id_ex_reg.funct7, id_stage->id_ex_reg.funct3);
+            ex_mem_reg.alu_out = alu.get_alu_result();
+            ex_mem_reg.alu_zero = alu.get_alu_is_zero();
+	}
+
+	ex_mem_reg.add_sum = id_stage->id_ex_reg.PC + id_stage->id_ex_reg.imm_gen_result;
+
+	
+	
+
 	/*
 	 * De-bugging
 	 * */
@@ -233,6 +309,30 @@ void MEM_Stage::tick()
 	mem_wb_reg.rs_1_index = ex_stage->ex_mem_reg.rs_1_index;
 	mem_wb_reg.rs_2_index = ex_stage->ex_mem_reg.rs_2_index;
 
+
+	mem_wb_reg.reg_write = ex_stage->ex_mem_reg.reg_write;
+	mem_wb_reg.mem_to_reg = ex_stage->ex_mem_reg.mem_to_reg;
+
+	if (ex_stage->ex_mem_reg.mem_write) 
+	{
+		data_memory.write_data(ex_stage->ex_mem_reg.alu_out, ex_stage->ex_mem_reg.read_data2);
+	}
+
+        if (ex_stage->ex_mem_reg.mem_read)
+	{
+                mem_wb_reg.data_mem_read = data_memory.read_data(ex_stage->ex_mem_reg.alu_out);
+        }  
+
+	mem_wb_reg.alu_zero = ex_stage->ex_mem_reg.alu_zero;
+	mem_wb_reg.alu_out = ex_stage->ex_mem_reg.alu_out;
+
+	/* Branching for IF stage */
+	if(ex_stage->ex_mem_reg.branch && ex_stage->ex_mem_reg.alu_zero)
+	{
+		if_stage->pc_src = 1;
+		if_stage->add_sum = ex_stage->ex_mem_reg.add_sum;
+	}
+
 	/*
 	 * De-bugging
 	 * */
@@ -265,6 +365,15 @@ void WB_Stage::tick()
 	instr = mem_stage->instr; // instruction pointer is also propagated from IF stage
 	
 	mem_stage->mem_wb_reg.valid = 0; 
+
+	uint64_t tmp;
+	tmp = (mem_stage->mem_wb_reg.mem_to_reg) ? mem_stage->mem_wb_reg.data_mem_read : mem_stage->mem_wb_reg.alu_out;
+    
+	if (mem_stage->mem_wb_reg.reg_write)
+	{
+		id_stage->registers.assign_reg(mem_stage->mem_wb_reg.rd_index, tmp);
+	}
+
 
 	if (DEBUG)
 	{
