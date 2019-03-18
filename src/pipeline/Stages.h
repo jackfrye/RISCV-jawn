@@ -68,13 +68,13 @@ struct id_ex_reg
 
 	long PC;	
 
-	uint64_t read_data1;
-	uint64_t read_data2;
+	int64_t read_data1;
+	int64_t read_data2;
 
-    	int64_t imm_gen_result;
+    int64_t imm_gen_result;
 
 	uint8_t funct7;
-    	uint8_t funct3;
+    uint8_t funct3;
 
 	bool jump;
 	bool jalr;
@@ -84,13 +84,13 @@ struct id_ex_reg
 
 struct ex_mem_reg
 {
-        int valid; // Is content inside register valid?
+    int valid; // Is content inside register valid?
 
-        int WB; // Is WB required?
+    int WB; // Is WB required?
 
-        int rd_index;
-        int rs_1_index;
-        int rs_2_index;
+    int rd_index;
+    int rs_1_index;
+    int rs_2_index;
 
 	/* Mem signals */
 	bool branch;
@@ -106,31 +106,31 @@ struct ex_mem_reg
 
 	/* ALU Signals */
 	bool alu_zero;
-    	uint64_t alu_out;
+    int64_t alu_out;
 
 	/* Memory Write Data/Register2 Data */
-	uint64_t read_data2;
+	int64_t read_data2;
 	
 };
 
 struct mem_wb_reg
 {
-        int valid; // Is content inside register valid?
+    int valid; // Is content inside register valid?
 
-        int WB; // Is WB required?
+    int WB; // Is WB required?
 
-        int rd_index;
-        int rs_1_index;
-        int rs_2_index;
+    int rd_index;
+    int rs_1_index;
+    int rs_2_index;
 
 	/* WB signals */
 	bool reg_write;
 	bool mem_to_reg;
 
-	unsigned int data_mem_read;
+	int data_mem_read;
 
 	bool alu_zero;
-	uint64_t alu_out;
+	int64_t alu_out;
 	
 };
 
@@ -241,10 +241,12 @@ public:
 class EX_Stage
 {
 public:
-        EX_Stage() : bubble(0), end(0)
+    EX_Stage() : bubble(0), end(0)
 	{
-                ex_mem_reg.valid = 0;
-        }
+        ex_mem_reg.valid = 0;
+        ex_mem_reg.alu_out = 0;
+        ex_mem_reg.read_data2 = 0;
+    }
 
 	Algo_Logic_Unit alu; 
 
@@ -281,22 +283,22 @@ public:
 class MEM_Stage
 {
 public:
-        MEM_Stage() : end(0)
-        {
-                mem_wb_reg.valid = 0;
-                mem_wb_reg.data_mem_read = 0;
-                mem_wb_reg.mem_to_reg = 0;
-                mem_wb_reg.alu_out = 0;
-        }
+    MEM_Stage() : end(0)
+    {
+        mem_wb_reg.valid = 0;
+        mem_wb_reg.data_mem_read = 0;
+        mem_wb_reg.mem_to_reg = 0;
+        mem_wb_reg.alu_out = 0;
+    }
 
-	Data_Memory data_memory;	
+	Data_Memory data_memory;
 
-        void tick();
+    void tick();
 
-        /*
-         * Important signals.
-         * */
-        list<Instruction>::iterator instr; // Points to the instruction currently in the stage
+    /*
+     * Important signals.
+     * */
+    list<Instruction>::iterator instr; // Points to the instruction currently in the stage
         
 	int end; // All instructions are exhausted?
 	
@@ -304,21 +306,21 @@ public:
          * Related Class
          * */
 	IF_Stage *if_stage;
-        EX_Stage *ex_stage;
+    EX_Stage *ex_stage;
 
 	/*
 	 * TODO, design component of MEM stage here.
 	 * */
 
-        /*
-         * TODO, define your MEM/WB register here.
-         * */
-        /*
+    /*
+     * TODO, define your MEM/WB register here.
+     * */
+    /*
 	 * Here shows the prototype of an in-complete MEM/WB register. Extend it further to get
 	 * a complete MEM/WB register.
 	 * */
 
-        struct mem_wb_reg mem_wb_reg;
+    struct mem_wb_reg mem_wb_reg;
 };
 
 class WB_Stage
@@ -329,19 +331,19 @@ public:
 
         }
 
-        void tick();
+    void tick();
 
-        /*
-         * Important signals.
-         * */
-        list<Instruction>::iterator instr; // Points to the instruction currently in the stage
-        
-	int end; // All instructions are exhausted?
+    /*
+     * Important signals.
+     * */
+    list<Instruction>::iterator instr; // Points to the instruction currently in the stage
+    
+    int end; // All instructions are exhausted?
 
-        /*
-         * Related Class
-         * */
-        MEM_Stage *mem_stage;
+    /*
+     * Related Class
+     * */
+    MEM_Stage *mem_stage;
 	ID_Stage *id_stage;
 
 	/*
