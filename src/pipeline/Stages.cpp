@@ -264,7 +264,18 @@ void EX_Stage::tick()
 	id_stage->id_ex_reg.valid = 0; // I only allow any unique instruction to be read only 
 					// once in order to increase simulator performance.
 
-		/* DATA FORWARDING LOGIC */
+
+
+	cout << "mem_stage->mem_wb_reg.reg_write: " << (int)(mem_stage->mem_wb_reg.reg_write) << endl;
+	cout << "mem_stage->mem_wb_reg.rd_index != 0: " << (int)(mem_stage->mem_wb_reg.rd_index != 0) << endl;
+	cout << "ex_mem_reg.reg_write: " << (int)(ex_mem_reg.reg_write) << endl;
+	cout << "ex_mem_reg.rd_index != 0: " << (int)(ex_mem_reg.rd_index != 0) << endl;
+	cout << "ex_mem_reg.rd_index" << (int)(ex_mem_reg.rd_index) << endl;
+	cout << "id_stage->id_ex_reg.rs_1_index: " << (int)(id_stage->id_ex_reg.rs_1_index) << endl;
+	cout << "mem_stage->mem_wb_reg.rd_index: " << (int)(mem_stage->mem_wb_reg.rd_index) << endl;
+	cout << "if_stage->if_id_reg.rs_1_index: " << (int)(if_stage->if_id_reg.rs_1_index) << endl;
+
+	/* DATA FORWARDING LOGIC */
 	int64_t alu_in1;
 	int64_t alu_in2;
 

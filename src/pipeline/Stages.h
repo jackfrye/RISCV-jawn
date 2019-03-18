@@ -261,6 +261,7 @@ public:
 	/*
          * Related Class
          * */
+	IF_Stage *if_stage;
         ID_Stage *id_stage;
 	MEM_Stage *mem_stage;
 	WB_Stage *wb_stage;
