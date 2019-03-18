@@ -147,10 +147,9 @@ public:
 							stall(0),
 							end(0)
 	{
-		// Initially, IF/ID Register is invalid.
-		if_id_reg.valid = 0;
-        pc_src = false;
-        add_sum = 0;
+	// Initially, IF/ID Register is invalid.
+	if_id_reg.valid = 0;
+        if_flush = false;
 	}
 
         void tick();
@@ -171,8 +170,7 @@ public:
 	/*
          * TODO, Design components of IF stage here
          * */
-	bool pc_src;
-	int64_t add_sum;
+	bool if_flush;
         long PC;
 
         Instruction_Memory *instr_mem;
@@ -263,7 +261,10 @@ public:
 	/*
          * Related Class
          * */
+	IF_Stage *if_stage;
         ID_Stage *id_stage;
+	MEM_Stage *mem_stage;
+	WB_Stage *wb_stage;
 
 	/*
 	 * TODO, design components of EX stage here.
@@ -328,10 +329,12 @@ class WB_Stage
 public:
         WB_Stage() : end(0)
         {
-
+		int64_t mux_out = 0;
         }
 
-    void tick();
+	int64_t mux_out;
+        void tick();
+
 
     /*
      * Important signals.
