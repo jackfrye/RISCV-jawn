@@ -149,7 +149,7 @@ public:
 	{
 	// Initially, IF/ID Register is invalid.
 	if_id_reg.valid = 0;
-        if_flush = false;
+        if_flush = 0;
 	}
 
         void tick();
