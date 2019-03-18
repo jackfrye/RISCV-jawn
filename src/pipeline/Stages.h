@@ -149,7 +149,7 @@ public:
 	{
 	// Initially, IF/ID Register is invalid.
 	if_id_reg.valid = 0;
-        if_flush = 0;
+        if_flush = false;
 	}
 
         void tick();
@@ -328,10 +328,10 @@ class WB_Stage
 public:
         WB_Stage() : end(0)
         {
-		uint64_t mux_out = 0;
+		int64_t mux_out = 0;
         }
 
-	uint64_t mux_out;
+	int64_t mux_out;
         void tick();
 
 
