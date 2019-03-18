@@ -6,5 +6,4 @@ addi x1, x0, 0 => Core ID: 0; Begin Exe: 4; End Exe: 8
 addi x1, x0, 0 => Core ID: 0; Begin Exe: 5; End Exe: 9
 addi x1, x0, 0 => Core ID: 0; Begin Exe: 6; End Exe: 10
 add x5, x6, x4 => Core ID: 0; Begin Exe: 7; End Exe: 11
-addi x1, x0, 0 => Core ID: 0; Begin Exe: 8; End Exe: 12
-add x7, x5, x0 => Core ID: 0; Begin Exe: 9; End Exe: 13
+add x7, x5, x0 => Core ID: 0; Begin Exe: 8; End Exe: 12

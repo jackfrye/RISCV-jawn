@@ -105,50 +105,39 @@ void ID_Stage::hazard_detection()
 	// Branching control logic
 	uint64_t add_sum = id_ex_reg.PC + id_ex_reg.imm_gen_result;
 	if (id_ex_reg.jump) { // Jump
-		cout << "Got Jump" << endl;
         	if_stage->if_flush = 1;
 		if_stage->PC = add_sum;
 		return;
     	}
 	else if(id_ex_reg.jalr)
 	{
-		cout << "Got JALR" << endl;
         	if_stage->if_flush = 1;
 		if_stage->PC = add_sum;
 	}
     	else if (!id_ex_reg.alu_op2 && id_ex_reg.alu_op1) { // ALUop 01 (BEQ)
-		cout << "Jawns" << endl;
 		int64_t tmp_result;
 		bool is_zero;
 		switch (id_ex_reg.funct3) {
 		    case BEQ:
-			cout << id_ex_reg.alu_op1 << endl;
-			cout << id_ex_reg.alu_op2 << endl;
-			cout << "BEQ" << endl;
 		        tmp_result = id_ex_reg.read_data1 - id_ex_reg.read_data2;
 		        is_zero = (tmp_result == 0) ? 1 : 0;
 		        break;
 		    case BNE:
-			cout << "BNE" << endl;
 		        tmp_result = id_ex_reg.read_data1 - id_ex_reg.read_data2;
 		        is_zero = (tmp_result != 0) ? 1 : 0;
 		        break;
 		    case BLT:
-			cout << "BLT" << endl;
 		        is_zero = (id_ex_reg.read_data1 < id_ex_reg.read_data2) ? 1 : 0;
 		        break;
 		    case BGT:
-			cout << "BGT" << endl;
 		        is_zero = (id_ex_reg.read_data1 >= id_ex_reg.read_data2) ? 1 : 0;
 		        break;
 		    default:
-			cout << "OTHER" << endl;
 		        is_zero = 0;
 		        break;
 		}
 		if(is_zero)
 		{
-			cout << "Setting instruction flush" << endl;
 			if_stage->if_flush = 1;
 			if_stage->PC = add_sum;
 			return;
@@ -265,16 +254,6 @@ void EX_Stage::tick()
 					// once in order to increase simulator performance.
 
 
-
-	cout << "mem_stage->mem_wb_reg.reg_write: " << (int)(mem_stage->mem_wb_reg.reg_write) << endl;
-	cout << "mem_stage->mem_wb_reg.rd_index != 0: " << (int)(mem_stage->mem_wb_reg.rd_index != 0) << endl;
-	cout << "ex_mem_reg.reg_write: " << (int)(ex_mem_reg.reg_write) << endl;
-	cout << "ex_mem_reg.rd_index != 0: " << (int)(ex_mem_reg.rd_index != 0) << endl;
-	cout << "ex_mem_reg.rd_index" << (int)(ex_mem_reg.rd_index) << endl;
-	cout << "id_stage->id_ex_reg.rs_1_index: " << (int)(id_stage->id_ex_reg.rs_1_index) << endl;
-	cout << "mem_stage->mem_wb_reg.rd_index: " << (int)(mem_stage->mem_wb_reg.rd_index) << endl;
-	cout << "if_stage->if_id_reg.rs_1_index: " << (int)(if_stage->if_id_reg.rs_1_index) << endl;
-
 	/* DATA FORWARDING LOGIC */
 	int64_t alu_in1;
 	int64_t alu_in2;
@@ -283,12 +262,10 @@ void EX_Stage::tick()
 	// ALU DATA 1
 	if(ex_mem_reg.reg_write && (ex_mem_reg.rd_index != 0) && (ex_mem_reg.rd_index == id_stage->id_ex_reg.rs_1_index) )
 	{
-		cout << "Reg1 Data forward from mem" << endl;
 		alu_in1 = mem_stage->mem_wb_reg.rs_1_index;
 	}
 	else if(mem_stage->mem_wb_reg.reg_write && (mem_stage->mem_wb_reg.rd_index != 0) && !( ex_mem_reg.reg_write && (ex_mem_reg.rd_index != 0) && (ex_mem_reg.rd_index == id_stage->id_ex_reg.rs_1_index) ) && (mem_stage->mem_wb_reg.rd_index == id_stage->id_ex_reg.rs_1_index ) )
 	{
-		cout << "Reg1 Data forward from wb" << endl;
 		alu_in1 = wb_stage->mux_out;
 	}
 	else
@@ -300,12 +277,10 @@ void EX_Stage::tick()
 	// ALU DATA 2
 	if(ex_mem_reg.reg_write && (ex_mem_reg.rd_index != 0) && (ex_mem_reg.rd_index == id_stage->id_ex_reg.rs_2_index) )
 	{
-		cout << "Reg2 Data forward from mem" << endl;
 		alu_in2 = mem_stage->mem_wb_reg.rs_2_index;
 	}
 	else if(mem_stage->mem_wb_reg.reg_write && (mem_stage->mem_wb_reg.rd_index != 0) && !( ex_mem_reg.reg_write && (ex_mem_reg.rd_index != 0) && (ex_mem_reg.rd_index == id_stage->id_ex_reg.rs_2_index) ) && (mem_stage->mem_wb_reg.rd_index == id_stage->id_ex_reg.rs_2_index ) )
 	{
-		cout << "Reg2 Data forward from wb" << endl;
 		alu_in2 = wb_stage->mux_out;
 	}
 	else
@@ -437,7 +412,7 @@ void WB_Stage::tick()
 
 	if (DEBUG)
 	{
-        cout << "WB : " << instr->raw_instr << " Output " << mux_out << " | ";
+        cout << "WB : " << instr->raw_instr << " | ";
 	}	
 }
 
