@@ -171,13 +171,13 @@ void ID_Stage::tick()
 	id_ex_reg.read_data2 = registers.read_reg(if_stage->if_id_reg.rs_2_index);
 
 	imm_gen.set_imm_gen(op_code, if_stage->if_id_reg.instruction);
-        id_ex_reg.imm_gen_result = imm_gen.get_imm_gen_result();
+    id_ex_reg.imm_gen_result = imm_gen.get_imm_gen_result();
 
 	id_ex_reg.funct7 = (if_stage->if_id_reg.instruction >> 25) & 0x7F;
-        id_ex_reg.funct3 = (if_stage->if_id_reg.instruction >> 12) & 0x7;
+    id_ex_reg.funct3 = (if_stage->if_id_reg.instruction >> 12) & 0x7;
 
 	id_ex_reg.jalr = control.get_jalr();
-        id_ex_reg.jump = control.get_jump();
+    id_ex_reg.jump = control.get_jump();
 
 
 	/*
@@ -199,22 +199,22 @@ void ID_Stage::tick()
 void EX_Stage::tick()
 {
 	if (bubble == 1)
-        {
-                // A bubble is inserted, do nothing.
-                return;
-        }
+    {
+            // A bubble is inserted, do nothing.
+            return;
+    }
 
-        if (end == 1)
-        {
-                // Instructions are run out, do nothing.
-                return;
-        }
+    if (end == 1)
+    {
+            // Instructions are run out, do nothing.
+            return;
+    }
 
-        if (id_stage->id_ex_reg.valid == 0)
-        {
-                // ID_EX register is invalid, do nothing.
-                return;
-        }
+    if (id_stage->id_ex_reg.valid == 0)
+    {
+            // ID_EX register is invalid, do nothing.
+            return;
+    }
 	
 	/*
 	 * FIXME, simulate EX stage here
@@ -233,6 +233,7 @@ void EX_Stage::tick()
 	ex_mem_reg.rs_1_index = id_stage->id_ex_reg.rs_1_index;
 	ex_mem_reg.rs_2_index = id_stage->id_ex_reg.rs_2_index;
 
+    ex_mem_reg.read_data2 = id_stage->id_ex_reg.read_data2;
 	
 	ex_mem_reg.branch = id_stage->id_ex_reg.branch;
 	ex_mem_reg.mem_read = id_stage->id_ex_reg.mem_read;
@@ -260,8 +261,15 @@ void EX_Stage::tick()
                 mux_read_data2 = id_stage->id_ex_reg.read_data2;
             }
 
-            alu.set_alu_ops( id_stage->id_ex_reg.read_data1, mux_read_data2, id_stage->id_ex_reg.alu_op1, id_stage->id_ex_reg.alu_op2, id_stage->id_ex_reg.funct7, id_stage->id_ex_reg.funct3);
+            alu.set_alu_ops( id_stage->id_ex_reg.read_data1,
+                             mux_read_data2, 
+                             id_stage->id_ex_reg.alu_op1, 
+                             id_stage->id_ex_reg.alu_op2, 
+                             id_stage->id_ex_reg.funct7, 
+                             id_stage->id_ex_reg.funct3);
+
             ex_mem_reg.alu_out = alu.get_alu_result();
+
             ex_mem_reg.alu_zero = alu.get_alu_is_zero();
 	}
 
@@ -281,21 +289,19 @@ void EX_Stage::tick()
 
 void MEM_Stage::tick()
 {
-        if (end == 1)
-        {
-                // Instructions are run out, do nothing.
-                return;
-        }
+    if (end == 1)
+    {
+            // Instructions are run out, do nothing.
+            return;
+    }
 
-        if (ex_stage->ex_mem_reg.valid == 0)
-        {
-                // EX_MEM register is invalid, do nothing.
-                return;
-        }
+    if (ex_stage->ex_mem_reg.valid == 0)
+    {
+            // EX_MEM register is invalid, do nothing.
+            return;
+    }
 	
-	/*
-	 * FIXME, simulate MEM stage here.
-         **/
+	/** FIXME, simulate MEM stage here.  **/
 	end = ex_stage->end; // end signal is propagated from IF stage
 
 	instr = ex_stage->instr; // instruction pointer is also propagated from IF stage
@@ -318,10 +324,10 @@ void MEM_Stage::tick()
 		data_memory.write_data(ex_stage->ex_mem_reg.alu_out, ex_stage->ex_mem_reg.read_data2);
 	}
 
-        if (ex_stage->ex_mem_reg.mem_read)
-	{
-                mem_wb_reg.data_mem_read = data_memory.read_data(ex_stage->ex_mem_reg.alu_out);
-        }  
+    if (ex_stage->ex_mem_reg.mem_read)
+    {
+        mem_wb_reg.data_mem_read = data_memory.read_data(ex_stage->ex_mem_reg.alu_out);
+    }  
 
 	mem_wb_reg.alu_zero = ex_stage->ex_mem_reg.alu_zero;
 	mem_wb_reg.alu_out = ex_stage->ex_mem_reg.alu_out;
@@ -366,7 +372,7 @@ void WB_Stage::tick()
 	
 	mem_stage->mem_wb_reg.valid = 0; 
 
-	uint64_t tmp;
+	int64_t tmp;
 	tmp = (mem_stage->mem_wb_reg.mem_to_reg) ? mem_stage->mem_wb_reg.data_mem_read : mem_stage->mem_wb_reg.alu_out;
 
 	if (mem_stage->mem_wb_reg.reg_write)
@@ -377,7 +383,7 @@ void WB_Stage::tick()
 
 	if (DEBUG)
 	{
-		cout << "WB : " << instr->raw_instr << " | ";
+        cout << "WB : " << instr->raw_instr << " Output " << tmp << " | ";
 	}	
 }
 
