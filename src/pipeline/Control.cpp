@@ -41,7 +41,7 @@ Control::Control(uint8_t _op_code)
         jalr = 0;
         jump = 0;
 		alu_src = 1;
-		mem_to_reg = -1;
+		mem_to_reg = 0;
 		reg_write = 0;
 		mem_read = 0;
 		mem_write = 1;
@@ -149,7 +149,7 @@ void Control::set_op_code(uint8_t _op_code)
         jalr = 0;
         jump = 0;
 		alu_src = 1;
-		mem_to_reg = -1;
+		mem_to_reg = 0;
 		reg_write = 0;
 		mem_read = 0;
 		mem_write = 1;

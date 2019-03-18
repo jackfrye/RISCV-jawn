@@ -12,11 +12,11 @@ class Data_Memory
 {
 public:
 	Data_Memory();
-	void write_data(long address, unsigned int _data);
-	unsigned int read_data(long address);
+	void write_data(long address, int _data);
+	int read_data(long address);
 	void print_mem(ofstream *out);
 private:
-	map<long, unsigned int> data;
+	map<long, int> data;
 };
 
 #endif

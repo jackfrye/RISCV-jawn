@@ -12,18 +12,10 @@ void Imm_gen::set_imm_gen(uint8_t op_code, uint32_t instruction)
     switch (op_code) {
         case LOAD:     
             tmp = (instruction >> 20) & 0xFFF; // Instruction[31:20]
-
-            if (tmp & 800) {
-                tmp |= ~0xFFF;
-            }
             break;
         case STORE:    
             tmp  =  (instruction >> 7)  & 0x1F;       // Instruction[11:7]
             tmp |= ((instruction >> 25) & 0x3F) << 5; // Instruction[31:25]
-
-            if (tmp & 800) {
-                tmp |= ~0xFFF;
-            }
             break;
         case JAL:
             tmp  = ((instruction >> 21) & 0x3FF);      // Instruction[30:21]
