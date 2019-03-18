@@ -3,6 +3,11 @@
 #include "Registers.h"
 #include "Imm_gen.h"
 
+#define BEQ 0
+#define BNE 1
+#define BLT 2
+#define BGT 3
+
 void IF_Stage::tick()
 {
 	if (end == 1)
@@ -21,7 +26,7 @@ void IF_Stage::tick()
 	/*
 	 * Simulate IF stage here
 	 * */
-	if (stall == 0)
+	if (stall == 0 && if_flush == 0)
 	{
 		// Get Instruction
 		Instruction &instruction = instr_mem->get_instruction(PC);
@@ -31,14 +36,7 @@ void IF_Stage::tick()
 
 		// Increment PC
 		// TODO, PC should be incremented or decremented based on instruction
-		if(pc_src == 0)
-		{
-			PC += 4;
-		}
-		else
-		{
-			PC = add_sum;
-		}
+		PC += 4;
 
 		/*
 		 * TODO, fix me. Simulate IF Stage here.
@@ -90,34 +88,57 @@ void ID_Stage::hazard_detection()
 	 * (3) MEM/WB.rd = ID/EX.rs1
 	 * (4) MEM/WB.rd = ID/EX.rs2
 	 * */
-	if (ex_stage->ex_mem_reg.valid == 1)
+
+	// Instruction tries to read a register following a load instruction that writes to the 
+	// same register
+	if( id_ex_reg.mem_read && ( (id_ex_reg.rd_index == if_stage->if_id_reg.rs_1_index) ||  (id_ex_reg.rd_index == if_stage->if_id_reg.rs_2_index) ) )
 	{
-		if (ex_stage->ex_mem_reg.rd_index == id_ex_reg.rs_1_index || 
-			ex_stage->ex_mem_reg.rd_index == id_ex_reg.rs_2_index)
+		if_stage->stall = 1; // Fetching should not proceed.
+		stall = 1; // ID should also stall.
+		ex_stage->bubble = 1; // EX stage should not accept any new instructions
+
+		instr->end_exe += 1; // The end execution time should be incremented by 1.
+
+		return;
+	}
+
+	// Branching control logic
+	uint64_t add_sum = id_ex_reg.PC + id_ex_reg.imm_gen_result;
+	if (id_ex_reg.alu_op1 && id_ex_reg.alu_op2) { // Jump
+        	if_stage->if_flush = 1;
+		if_stage->PC = add_sum;
+		return;
+    	}
+    	else if (!id_ex_reg.alu_op1 && id_ex_reg.alu_op2) { // ALUop 01 (BEQ)
+		int64_t tmp_result;
+		bool is_zero;
+		switch (id_ex_reg.funct3) {
+		    case BEQ:
+		        tmp_result = id_ex_reg.read_data1 - id_ex_reg.read_data2;
+		        is_zero = (tmp_result == 0) ? 1 : 0;
+		        break;
+		    case BNE:
+		        tmp_result = id_ex_reg.read_data1 - id_ex_reg.read_data2;
+		        is_zero = (tmp_result != 0) ? 1 : 0;
+		        break;
+		    case BLT:
+		        is_zero = (id_ex_reg.read_data1 < id_ex_reg.read_data2) ? 1 : 0;
+		        break;
+		    case BGT:
+		        is_zero = (id_ex_reg.read_data1 >= id_ex_reg.read_data2) ? 1 : 0;
+		        break;
+		    default:
+		        is_zero = 0;
+		        break;
+		}
+		if(is_zero)
 		{
-			if_stage->stall = 1; // Fetching should not proceed.
-			stall = 1; // ID should also stall.
-			ex_stage->bubble = 1; // EX stage should not accept any new instructions
-
-			instr->end_exe += 1; // The end execution time should be incremented by 1.
-
+			if_stage->if_flush = 1;
+			if_stage->PC = add_sum;
 			return;
 		}
-	}
-	else if (mem_stage->mem_wb_reg.valid == 1)
-	{
-		if (mem_stage->mem_wb_reg.rd_index == id_ex_reg.rs_1_index || 
-			mem_stage->mem_wb_reg.rd_index == id_ex_reg.rs_2_index)
-		{
-			if_stage->stall = 1; // Fetching should not proceed.
-			stall = 1; // ID should also stall.
-			ex_stage->bubble = 1; // EX stage should not accept any new instructions
+    	}
 
-			instr->end_exe += 1; // The end execution time should be incremented by 1.
-			
-			return;
-		}
-	}
 
 	if_stage->stall = 0; // No hazard found, fetching proceed.
 	stall = 0; // No hazard found, ID stage proceed.
@@ -151,8 +172,6 @@ void ID_Stage::tick()
 	id_ex_reg.rs_1_index = if_stage->if_id_reg.rs_1_index;
 	id_ex_reg.rs_2_index = if_stage->if_id_reg.rs_2_index;
 
-	hazard_detection();
-
 	uint8_t op_code = if_stage->if_id_reg.instruction & 0x007F;
 	control.set_op_code(op_code);
 
@@ -178,6 +197,8 @@ void ID_Stage::tick()
 
 	id_ex_reg.jalr = control.get_jalr();
         id_ex_reg.jump = control.get_jump();
+
+	hazard_detection();
 
 
 	/*
@@ -240,36 +261,50 @@ void EX_Stage::tick()
 	ex_mem_reg.reg_write = id_stage->id_ex_reg.reg_write;
 	ex_mem_reg.mem_to_reg = id_stage->id_ex_reg.mem_to_reg;
 
-	int64_t mux_read_data2;
-	if (id_stage->id_ex_reg.jump) {
-            //registers->assign_reg(write_register, PC+4);
-            //PC = imm_gen_result;
-        }
-        if (id_stage->id_ex_reg.jalr) {
-            //PC = registers->read_reg(read_register1);
-            //PC += registers->read_reg(write_register);
-            //PC += imm_gen_result;
-        }
-        else {
-            // ALU Mux
-            if (id_stage->id_ex_reg.alu_src) {
-                mux_read_data2 = id_stage->id_ex_reg.imm_gen_result;
-            }
-            else
-            {
-                mux_read_data2 = id_stage->id_ex_reg.read_data2;
-            }
+	/* DATA FORWARDING LOGIC */
+	int64_t alu_in1;
+	int64_t alu_in2;
 
-            alu.set_alu_ops( id_stage->id_ex_reg.read_data1, mux_read_data2, id_stage->id_ex_reg.alu_op1, id_stage->id_ex_reg.alu_op2, id_stage->id_ex_reg.funct7, id_stage->id_ex_reg.funct3);
-            ex_mem_reg.alu_out = alu.get_alu_result();
-            ex_mem_reg.alu_zero = alu.get_alu_is_zero();
+	/* ALU input 1 gets from mem stage */
+	// ALU DATA 1
+	if(ex_mem_reg.reg_write && (ex_mem_reg.rd_index != 0) && (ex_mem_reg.rd_index != id_stage->id_ex_reg.rs_1_index) )
+	{
+		alu_in1 = mem_stage->mem_wb_reg.rs_1_index;
 	}
+	else if(mem_stage->mem_wb_reg.reg_write && (mem_stage->mem_wb_reg.rd_index != 0) && !( ex_mem_reg.reg_write && (ex_mem_reg.rd_index != 0) && (ex_mem_reg.rd_index == id_stage->id_ex_reg.rs_1_index) ) && (mem_stage->mem_wb_reg.rd_index == id_stage->id_ex_reg.rs_1_index ) )
+	{
+		alu_in1 = wb_stage->mux_out;
+	}
+	else
+	{
+		alu_in1 = id_stage->id_ex_reg.read_data1;
+	}
+	//
+
+	// ALU DATA 2
+	if(ex_mem_reg.reg_write && (ex_mem_reg.rd_index != 0) && (ex_mem_reg.rd_index != id_stage->id_ex_reg.rs_2_index) )
+	{
+		alu_in2 = mem_stage->mem_wb_reg.rs_2_index;
+	}
+	else if(mem_stage->mem_wb_reg.reg_write && (mem_stage->mem_wb_reg.rd_index != 0) && !( ex_mem_reg.reg_write && (ex_mem_reg.rd_index != 0) && (ex_mem_reg.rd_index == id_stage->id_ex_reg.rs_2_index) ) && (mem_stage->mem_wb_reg.rd_index == id_stage->id_ex_reg.rs_2_index ) )
+	{
+		alu_in2 = wb_stage->mux_out;
+	}
+	else
+	{
+		alu_in2 = id_stage->id_ex_reg.read_data2;
+	}
+	//
+
+
+
+	alu.set_alu_ops( alu_in1, alu_in2, id_stage->id_ex_reg.alu_op1, id_stage->id_ex_reg.alu_op2, id_stage->id_ex_reg.funct7, id_stage->id_ex_reg.funct3);
+	ex_mem_reg.alu_out = alu.get_alu_result();
+	ex_mem_reg.alu_zero = alu.get_alu_is_zero();
 
 	ex_mem_reg.add_sum = id_stage->id_ex_reg.PC + id_stage->id_ex_reg.imm_gen_result;
 
 	
-	
-
 	/*
 	 * De-bugging
 	 * */
@@ -326,12 +361,6 @@ void MEM_Stage::tick()
 	mem_wb_reg.alu_zero = ex_stage->ex_mem_reg.alu_zero;
 	mem_wb_reg.alu_out = ex_stage->ex_mem_reg.alu_out;
 
-	/* Branching for IF stage */
-	if(ex_stage->ex_mem_reg.branch && ex_stage->ex_mem_reg.alu_zero)
-	{
-		if_stage->pc_src = 1;
-		if_stage->add_sum = ex_stage->ex_mem_reg.add_sum;
-	}
 
 	/*
 	 * De-bugging
@@ -366,12 +395,11 @@ void WB_Stage::tick()
 	
 	mem_stage->mem_wb_reg.valid = 0; 
 
-	uint64_t tmp;
-	tmp = (mem_stage->mem_wb_reg.mem_to_reg) ? mem_stage->mem_wb_reg.data_mem_read : mem_stage->mem_wb_reg.alu_out;
+	mux_out = (mem_stage->mem_wb_reg.mem_to_reg) ? mem_stage->mem_wb_reg.data_mem_read : mem_stage->mem_wb_reg.alu_out;
 
 	if (mem_stage->mem_wb_reg.reg_write)
 	{
-		id_stage->registers.assign_reg(mem_stage->mem_wb_reg.rd_index, tmp);
+		id_stage->registers.assign_reg(mem_stage->mem_wb_reg.rd_index, mux_out);
 	}
 
 
