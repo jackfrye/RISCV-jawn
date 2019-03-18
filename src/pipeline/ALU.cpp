@@ -46,7 +46,7 @@ void Algo_Logic_Unit::set_alu_ops(int64_t op_1, int64_t op_2, bool alu_op_0, boo
     }
     else if (alu_op_1 && !alu_op_0) { // ALUop 10 (R-type or I-type)
         switch (funct3) {
-            case 0x0: tmp_result = op_1  + op_2; break;
+            case 0x0: tmp_result = op_1  + op_2; break; 
             case 0x1: tmp_result = op_1 << op_2; break;
             case 0x4: tmp_result = op_1  ^ op_2; break;
             case 0x5: tmp_result = op_1 >> op_2; break;

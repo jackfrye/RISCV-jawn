@@ -328,6 +328,9 @@ void EX_Stage::tick()
 	ex_mem_reg.reg_write = id_stage->id_ex_reg.reg_write;
 	ex_mem_reg.mem_to_reg = id_stage->id_ex_reg.mem_to_reg;
 
+    if (id_stage->id_ex_reg.alu_src)
+        alu_in2 = id_stage->id_ex_reg.imm_gen_result;
+
 	alu.set_alu_ops( alu_in1, alu_in2, id_stage->id_ex_reg.alu_op1, id_stage->id_ex_reg.alu_op2, id_stage->id_ex_reg.funct7, id_stage->id_ex_reg.funct3);
 	ex_mem_reg.alu_out = alu.get_alu_result();
 	ex_mem_reg.alu_zero = alu.get_alu_is_zero();
